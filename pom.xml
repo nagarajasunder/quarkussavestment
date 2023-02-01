@@ -15,6 +15,7 @@
     <quarkus.platform.version>2.16.0.Final</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+    <jooq.version>3.17.7</jooq.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -32,10 +33,23 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-reactive-jsonb</artifactId>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jooq/jooq -->
     <dependency>
-      <groupId>io.quarkiverse.jooq</groupId>
-      <artifactId>quarkus-jooq</artifactId>
-      <version>0.4.0</version>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>3.17.6</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jooq/jooq-meta -->
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-meta</artifactId>
+      <version>3.17.6</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jooq/jooq-codegen -->
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-codegen</artifactId>
+      <version>3.17.6</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -122,6 +136,46 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>3.17.6</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1212</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <jdbc>
+            <driver>org.postgresql.Driver</driver>
+            <url>jdbc:postgresql://localhost/quarkus_banking</url>
+            <user>postgres</user>
+            <password>Gowtham#007</password>
+          </jdbc>
+          <generator>
+            <name>org.jooq.codegen.DefaultGenerator</name>
+            <database>
+              <name>org.jooq.meta.postgres.PostgresDatabase</name>
+              <inputSchema>public</inputSchema>
+              <includes>.*</includes>
+              <excludes></excludes>
+            </database>
+            <target>
+              <packageName>jooq</packageName>
+              <directory>com.geekydroid.savestment.domain</directory>
+            </target>
+          </generator>
+        </configuration>
       </plugin>
     </plugins>
   </build>
