@@ -1,7 +1,10 @@
 package com.geekydroid.domain.investment;
 
+import com.geekydroid.domain.enums.TradeType;
+
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -29,7 +32,7 @@ public class InvestmentItems {
     private String symbol;
 
     @Column(name = "TRADE_DATE")
-    private String tradeDate;
+    private LocalDate tradeDate;
 
     @Column(name = "TRADE_TYPE")
     private TradeType tradeType;
@@ -47,13 +50,13 @@ public class InvestmentItems {
     private UUID createdBy;
 
     @Column(name = "CREATED_ON")
-    private LocalDate createdOn;
+    private LocalDateTime createdOn;
 
 
     @Column(name = "UPDATED_ON")
-    private LocalDate updatedOn;
+    private LocalDateTime updatedOn;
 
-    public InvestmentItems(InvestmentTypes investmentTypes, String symbol, String tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDate createdOn, LocalDate updatedOn) {
+    public InvestmentItems(InvestmentTypes investmentTypes, String symbol, LocalDate tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.investmentTypes = investmentTypes;
         this.symbol = symbol;
         this.tradeDate = tradeDate;
@@ -85,11 +88,11 @@ public class InvestmentItems {
         this.symbol = symbol;
     }
 
-    public String getTradeDate() {
+    public LocalDate getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(LocalDate tradeDate) {
         this.tradeDate = tradeDate;
     }
 
@@ -133,19 +136,19 @@ public class InvestmentItems {
         this.createdBy = createdBy;
     }
 
-    public LocalDate getCreatedOn() {
+    public LocalDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDate createdOn) {
+    public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
     }
 
-    public LocalDate getUpdatedOn() {
+    public LocalDateTime getUpdatedOn() {
         return updatedOn;
     }
 
-    public void setUpdatedOn(LocalDate updatedOn) {
+    public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
     }
 
@@ -158,7 +161,3 @@ public class InvestmentItems {
     }
 }
 
-enum TradeType {
-    BUY,
-    SELL
-}

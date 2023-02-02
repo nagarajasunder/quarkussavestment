@@ -2,6 +2,7 @@ package com.geekydroid.domain.investment;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Table(name = "INVESTMENT_TYPES")
 @Entity
@@ -10,7 +11,7 @@ public class InvestmentTypes {
     public InvestmentTypes() {
     }
 
-    public InvestmentTypes(Long investmentTypeId, String investmentName, LocalDate createdOn, LocalDate updatedOn) {
+    public InvestmentTypes(Long investmentTypeId, String investmentName, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.investmentTypeId = investmentTypeId;
         this.investmentName = investmentName;
         this.createdOn = createdOn;
@@ -36,10 +37,10 @@ public class InvestmentTypes {
     private String investmentName;
 
     @Column(name = "CREATED_ON")
-    private LocalDate createdOn;
+    private LocalDateTime createdOn;
 
     @Column(name = "UPDATED_ON")
-    private LocalDate updatedOn;
+    private LocalDateTime updatedOn;
 
 
     public Long getInvestmentTypeId() {
@@ -58,19 +59,19 @@ public class InvestmentTypes {
         this.investmentName = investmentName;
     }
 
-    public LocalDate getCreatedOn() {
+    public LocalDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDate createdOn) {
+    public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
     }
 
-    public LocalDate getUpdatedOn() {
+    public LocalDateTime getUpdatedOn() {
         return updatedOn;
     }
 
-    public void setUpdatedOn(LocalDate updatedOn) {
+    public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
     }
 }
