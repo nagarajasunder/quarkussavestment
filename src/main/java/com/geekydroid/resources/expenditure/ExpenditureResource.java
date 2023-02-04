@@ -8,7 +8,7 @@ import javax.ws.rs.Path;
 public class ExpenditureResource{
 
     public Expenditure addNewExpenditure() {
-
+        return null;
     }
 
 }

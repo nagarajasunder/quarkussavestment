@@ -1,10 +1,8 @@
 package com.geekydroid.domain.expenditure;
 
 import com.geekydroid.domain.enums.Paymode;
-import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

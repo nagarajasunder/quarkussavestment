@@ -4,6 +4,7 @@ import com.geekydroid.domain.expenditure.Expenditure;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @ApplicationScoped
 @Transactional
