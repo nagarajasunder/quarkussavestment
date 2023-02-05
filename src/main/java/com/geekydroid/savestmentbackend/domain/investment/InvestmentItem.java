@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "INVESTMENT_ITEMS")
-public class InvestmentItems {
+public class InvestmentItem {
 
     @SequenceGenerator(
             name = "investment_item_id_generator",
@@ -56,7 +56,7 @@ public class InvestmentItems {
     @Column(name = "UPDATED_ON")
     private LocalDateTime updatedOn;
 
-    public InvestmentItems(InvestmentTypes investmentTypes, String symbol, LocalDate tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
+    public InvestmentItem(InvestmentTypes investmentTypes, String symbol, LocalDate tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.investmentTypes = investmentTypes;
         this.symbol = symbol;
         this.tradeDate = tradeDate;
@@ -69,7 +69,7 @@ public class InvestmentItems {
         this.updatedOn = updatedOn;
     }
 
-    public InvestmentItems() {
+    public InvestmentItem() {
     }
 
     public Long getInvestmentId() {

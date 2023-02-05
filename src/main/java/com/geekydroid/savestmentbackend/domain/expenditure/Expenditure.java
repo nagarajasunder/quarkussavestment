@@ -1,5 +1,6 @@
 package com.geekydroid.savestmentbackend.domain.expenditure;
 
+import com.geekydroid.savestmentbackend.db.ExpenditureNumberSequenceGenerator;
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,9 +20,9 @@ public class Expenditure {
             name = "expenditure_number_generator",
             strategy = "com.geekydroid.savestmentbackend.db.ExpenditureNumberSequenceGenerator",
             parameters = {
-                    @org.hibernate.annotations.Parameter(name = "ExpenditureNumberSequenceGenerator.INCREMENT_PARAM", value = "50"),
-                    @org.hibernate.annotations.Parameter(name = "ExpenditureNumberSequenceGenerator.VALUE_PREFIX_PARAMETER", value = "EXP_"),
-                    @org.hibernate.annotations.Parameter(name = "ExpenditureNumberSequenceGenerator.NUMBER_FORMAT_PARAMETER", value = "%d"),
+                    @org.hibernate.annotations.Parameter(name = ExpenditureNumberSequenceGenerator.INCREMENT_PARAM, value = "50"),
+                    @org.hibernate.annotations.Parameter(name = ExpenditureNumberSequenceGenerator.VALUE_PREFIX_PARAMETER, value = "EXP_"),
+                    @org.hibernate.annotations.Parameter(name = ExpenditureNumberSequenceGenerator.NUMBER_FORMAT_PARAMETER, value = "%d"),
             }
     )
     @Column(name = "expenditure_number")
