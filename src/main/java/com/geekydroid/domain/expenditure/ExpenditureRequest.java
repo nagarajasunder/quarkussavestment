@@ -1,5 +1,7 @@
 package com.geekydroid.domain.expenditure;
 
+import com.geekydroid.domain.enums.Paymode;
+
 public class ExpenditureRequest {
 
 
@@ -7,16 +9,19 @@ public class ExpenditureRequest {
     private String expenditureDate;
     private String expenditureCategory;
     private Double amount;
-    private String paymode;
+    private Paymode paymode;
     private String notes;
     private String createdBy;
+
+    public ExpenditureRequest() {
+    }
 
     public ExpenditureRequest(
             String expenditureType,
             String expenditureDate,
             String expenditureCategory,
             Double amount,
-            String paymode,
+            Paymode paymode,
             String notes,
             String createdBy
     ) {
@@ -26,6 +31,62 @@ public class ExpenditureRequest {
         this.amount = amount;
         this.paymode = paymode;
         this.notes = notes;
+        this.createdBy = createdBy;
+    }
+
+    public String getExpenditureType() {
+        return expenditureType;
+    }
+
+    public void setExpenditureType(String expenditureType) {
+        this.expenditureType = expenditureType;
+    }
+
+    public String getExpenditureDate() {
+        return expenditureDate;
+    }
+
+    public void setExpenditureDate(String expenditureDate) {
+        this.expenditureDate = expenditureDate;
+    }
+
+    public String getExpenditureCategory() {
+        return expenditureCategory;
+    }
+
+    public void setExpenditureCategory(String expenditureCategory) {
+        this.expenditureCategory = expenditureCategory;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public Paymode getPaymode() {
+        return paymode;
+    }
+
+    public void setPaymode(Paymode paymode) {
+        this.paymode = paymode;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 }

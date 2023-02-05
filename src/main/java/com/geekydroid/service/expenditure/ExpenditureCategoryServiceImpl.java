@@ -19,4 +19,9 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
     public List<ExpenditureCategory> getAllExpenditureCategories() {
         return repository.getAllExpenditureCategories();
     }
+
+    @Override
+    public ExpenditureCategory getExpenditureCategoryByName(String expenditureCategoryStr) {
+        return repository.getExpenditureCategoryName(expenditureCategoryStr);
+    }
 }

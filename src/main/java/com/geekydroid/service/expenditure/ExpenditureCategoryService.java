@@ -10,6 +10,7 @@ import java.util.List;
 @Transactional
 public interface ExpenditureCategoryService {
 
-    public List<ExpenditureCategory> getAllExpenditureCategories();
+    List<ExpenditureCategory> getAllExpenditureCategories();
 
+    ExpenditureCategory getExpenditureCategoryByName(String expenditureCategoryStr);
 }

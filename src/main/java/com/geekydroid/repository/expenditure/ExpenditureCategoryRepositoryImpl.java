@@ -33,4 +33,9 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
         return context.select().from(table("EXPENDITURE_CATEGORY")).fetchInto(ExpenditureCategory.class);
     }
 
+    @Override
+    public ExpenditureCategory getExpenditureCategoryName(String expenditureCategoryStr) {
+        return ExpenditureCategory.find("categoryName",expenditureCategoryStr).firstResult();
+    }
+
 }

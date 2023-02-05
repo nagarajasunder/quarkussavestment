@@ -13,4 +13,6 @@ public interface ExpenditureCategoryRepository {
     public void createNewExpenditureCategory(ExpenditureCategory expenditureCategory);
 
     public List<ExpenditureCategory> getAllExpenditureCategories();
+
+    ExpenditureCategory getExpenditureCategoryName(String expenditureCategoryStr);
 }

@@ -1,6 +1,8 @@
 package com.geekydroid.service.expenditure;
 
 import com.geekydroid.domain.expenditure.Expenditure;
+import com.geekydroid.domain.expenditure.ExpenditureCategory;
+import com.geekydroid.domain.expenditure.ExpenditureRequest;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
@@ -10,7 +12,7 @@ import java.util.List;
 @Transactional
 public interface ExpenditureService {
 
-    void createExpenditure(Expenditure expenditure);
+    ExpenditureRequest createExpenditure(ExpenditureRequest expenditureRequest, ExpenditureCategory expenditureCategory);
 
     void updateExpenditure(Expenditure expenditure);
 

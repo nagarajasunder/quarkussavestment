@@ -9,7 +9,7 @@ import javax.transaction.Transactional;
 @ApplicationScoped
 public interface ExpenditureRepository {
 
-    void createExpenditure(Expenditure expenditure);
+    Expenditure createExpenditure(Expenditure expenditure);
 
     void updateExpenditure(Expenditure expenditure);
 
