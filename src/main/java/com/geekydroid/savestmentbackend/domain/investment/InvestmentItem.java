@@ -1,6 +1,9 @@
 package com.geekydroid.savestmentbackend.domain.investment;
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import org.hibernate.annotations.GenericGenerator;
+import com.geekydroid.savestmentbackend.db.EquityNumberSequenceGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -9,24 +12,32 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "INVESTMENT_ITEMS")
-public class InvestmentItem {
+public class InvestmentItem extends PanacheEntityBase {
 
-    @SequenceGenerator(
-            name = "investment_item_id_generator",
-            sequenceName = "investment_item_id_generator",
-            initialValue = 10,
-            allocationSize = 1
+    @GenericGenerator(
+            name = "investment_number_seq",
+            strategy = "com.geekydroid.savestmentbackend.db.EquityNumberSequenceGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(
+                            name = EquityNumberSequenceGenerator.VALUE_PREFIX_PARAMETER,
+                            value = "INV_"
+                    ),
+                    @org.hibernate.annotations.Parameter(
+                            name = EquityNumberSequenceGenerator.NUMBER_FORMAT_PARAMETER,
+                            value = "%d"
+                    )
+            }
     )
     @Id
     @GeneratedValue(
-            generator = "investment_item_id_generator",
-            strategy = GenerationType.IDENTITY
+            generator = "investment_number_seq",
+            strategy = GenerationType.SEQUENCE
     )
-    private Long investmentId;
+    private String investmentId;
 
     @OneToOne
     @JoinColumn(name = "investment_types_investment_type_id")
-    private InvestmentTypes investmentTypes;
+    private InvestmentType investmentType;
 
     @Column(name = "SYMBOL")
     private String symbol;
@@ -56,8 +67,8 @@ public class InvestmentItem {
     @Column(name = "UPDATED_ON")
     private LocalDateTime updatedOn;
 
-    public InvestmentItem(InvestmentTypes investmentTypes, String symbol, LocalDate tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
-        this.investmentTypes = investmentTypes;
+    public InvestmentItem(InvestmentType investmentType, String symbol, LocalDate tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
+        this.investmentType = investmentType;
         this.symbol = symbol;
         this.tradeDate = tradeDate;
         this.tradeType = tradeType;
@@ -72,11 +83,11 @@ public class InvestmentItem {
     public InvestmentItem() {
     }
 
-    public Long getInvestmentId() {
+    public String getInvestmentId() {
         return investmentId;
     }
 
-    public void setInvestmentId(Long investmentId) {
+    public void setInvestmentId(String investmentId) {
         this.investmentId = investmentId;
     }
 
@@ -152,12 +163,12 @@ public class InvestmentItem {
         this.updatedOn = updatedOn;
     }
 
-    public InvestmentTypes getInvestmentTypes() {
-        return investmentTypes;
+    public InvestmentType getInvestmentTypes() {
+        return investmentType;
     }
 
-    public void setInvestmentTypes(InvestmentTypes investmentTypes) {
-        this.investmentTypes = investmentTypes;
+    public void setInvestmentTypes(InvestmentType investmentType) {
+        this.investmentType = investmentType;
     }
 }
 

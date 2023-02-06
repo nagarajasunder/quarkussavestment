@@ -2,12 +2,13 @@ package com.geekydroid.savestmentbackend.resources.investment;
 
 
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
+import com.geekydroid.savestmentbackend.service.investment.InvestmentService;
+import com.geekydroid.savestmentbackend.utils.ResponseUtil;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.inject.Inject;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -15,11 +16,14 @@ import java.util.List;
 @Path("/investment")
 public class InvestmentResource {
 
-    @GET()
+    @Inject
+    InvestmentService investmentService;
+
+    @POST()
     @Path("/addEquity")
 
-    public void addEquity(List<EquityItem> equityItems) {
-
+    public Response addEquity(List<EquityItem> equityItems) {
+        return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems));
     }
 
 }

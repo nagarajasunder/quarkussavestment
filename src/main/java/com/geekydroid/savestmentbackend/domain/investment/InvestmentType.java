@@ -1,17 +1,18 @@
 package com.geekydroid.savestmentbackend.domain.investment;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table(name = "INVESTMENT_TYPES")
 @Entity
-public class InvestmentTypes {
+public class InvestmentType extends PanacheEntityBase {
 
-    public InvestmentTypes() {
+    public InvestmentType() {
     }
 
-    public InvestmentTypes(Long investmentTypeId, String investmentName, LocalDateTime createdOn, LocalDateTime updatedOn) {
+    public InvestmentType(Long investmentTypeId, String investmentName, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.investmentTypeId = investmentTypeId;
         this.investmentName = investmentName;
         this.createdOn = createdOn;

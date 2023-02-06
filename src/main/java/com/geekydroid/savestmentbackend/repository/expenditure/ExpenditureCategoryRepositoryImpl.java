@@ -1,5 +1,6 @@
 package com.geekydroid.savestmentbackend.repository.expenditure;
 
+import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
 import org.jooq.DSLContext;
 

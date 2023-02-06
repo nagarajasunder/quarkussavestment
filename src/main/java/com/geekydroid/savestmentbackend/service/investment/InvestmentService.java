@@ -1,11 +1,12 @@
 package com.geekydroid.savestmentbackend.service.investment;
 
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
+import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
+import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 import java.util.List;
 
 public interface InvestmentService {
 
-    void addEquityItems(List<EquityItem> equityItems);
-
+    NetworkResponse addEquityItems(List<EquityItem> equityItems);
 }

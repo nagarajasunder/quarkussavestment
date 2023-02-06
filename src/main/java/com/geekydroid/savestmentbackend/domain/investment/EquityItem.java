@@ -1,60 +1,73 @@
 package com.geekydroid.savestmentbackend.domain.investment;
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
-import com.google.gson.annotations.SerializedName;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class EquityItem {
 
-    @SerializedName("investment_type")
+
     private String investmentType;
-    @SerializedName("symbol")
     private String symbol;
 
-    @SerializedName("trade_date")
+
     private LocalDate tradeDate;
 
-    @SerializedName("trade_type")
+
     private TradeType tradeType;
 
-    @SerializedName("units")
     private Double quantity;
 
-    @SerializedName("price")
     private Double price;
 
-    @SerializedName("amount_invested")
+
     private Double amountInvested;
 
-    @SerializedName("created_on")
+
+    private UUID createdBy;
+
+
     private LocalDateTime createdOn;
 
-    @SerializedName("updated_on")
+
     private LocalDateTime updatedOn;
 
     public EquityItem(
+            String investmentType,
             String symbol,
             LocalDate tradeDate,
             TradeType tradeType,
             Double quantity,
             Double price,
             Double amountInvested,
+            UUID createdBy,
             LocalDateTime createdOn,
             LocalDateTime updatedOn
     ) {
+
+        this.investmentType = investmentType;
         this.symbol = symbol;
         this.tradeDate = tradeDate;
         this.tradeType = tradeType;
         this.quantity = quantity;
         this.price = price;
         this.amountInvested = amountInvested;
+        this.createdBy = createdBy;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
     }
 
     public EquityItem() {
+    }
+
+    public String getInvestmentType() {
+        return investmentType;
+    }
+
+    public void setInvestmentType(String investmentType) {
+        this.investmentType = investmentType;
     }
 
     public String getSymbol() {
@@ -105,6 +118,14 @@ public class EquityItem {
         this.amountInvested = amountInvested;
     }
 
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public LocalDateTime getCreatedOn() {
         return createdOn;
     }
@@ -120,4 +141,6 @@ public class EquityItem {
     public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
     }
+
+
 }
