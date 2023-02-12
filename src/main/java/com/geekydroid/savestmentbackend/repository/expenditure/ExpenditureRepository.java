@@ -4,6 +4,7 @@ import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Transactional
 @ApplicationScoped
@@ -16,4 +17,6 @@ public interface ExpenditureRepository {
     Expenditure deleteExpenditure(String expNumber);
 
     Expenditure getExpenditureByExpNumber(String expNumber);
+
+    List<Double> getTotalExpenseAndIncomeAmount(String startDate, String endDate);
 }

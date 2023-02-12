@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import com.geekydroid.savestmentbackend.db.ExpenditureNumberSequenceGenerator;
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "EXPENDITURE")
-public class Expenditure {
+public class Expenditure extends PanacheEntityBase {
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

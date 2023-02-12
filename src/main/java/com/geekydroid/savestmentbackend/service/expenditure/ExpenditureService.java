@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.service.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureOverview;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureRequest;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
@@ -18,6 +19,7 @@ public interface ExpenditureService {
 
     NetworkResponse deleteExpenditure(String expNumber);
 
+    ExpenditureOverview getExpenditureOverview(String startDate,String endDate);
 
 
 }

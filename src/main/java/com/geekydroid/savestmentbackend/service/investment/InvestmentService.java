@@ -9,4 +9,8 @@ import java.util.List;
 public interface InvestmentService {
 
     NetworkResponse addEquityItems(List<EquityItem> equityItems);
+
+    NetworkResponse updateEquityItems(String EquityNumber,EquityItem equityItem);
+
+    NetworkResponse deleteEquityItem(String equityNumber);
 }

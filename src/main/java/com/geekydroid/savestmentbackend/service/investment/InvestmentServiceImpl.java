@@ -6,12 +6,13 @@ import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentRepository;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentTypeRepository;
 import com.geekydroid.savestmentbackend.utils.models.Error;
-import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
-import com.geekydroid.savestmentbackend.utils.models.Success;
+import com.geekydroid.savestmentbackend.utils.models.Exception;
+import com.geekydroid.savestmentbackend.utils.models.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,6 +58,47 @@ public class InvestmentServiceImpl implements InvestmentService {
             }
         }
         return new Error(Response.Status.INTERNAL_SERVER_ERROR, null, null);
+    }
+
+    @Override
+    public NetworkResponse updateEquityItems(String EquityNumber, EquityItem equityItem) {
+        GenericNetworkResponse errorResp = new GenericNetworkResponse();
+        InvestmentType investmentType;
+        if (EquityNumber == null || EquityNumber.isEmpty()) {
+            errorResp.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+            errorResp.setMessage("Equity number should not be empty");
+            errorResp.setStatus("FAILED");
+            return new Error(Response.Status.BAD_REQUEST, null, errorResp);
+        }
+        else {
+            InvestmentItem item = investmentRepository.findInvestmentItemById(EquityNumber);
+            if (item == null) {
+                errorResp.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+                errorResp.setMessage("Equity with number "+EquityNumber+" doesn't exist.");
+                errorResp.setStatus("FAILED");
+                return new Error(Response.Status.BAD_REQUEST, null, errorResp);
+            }
+            investmentType = investmentTypeRepository.findInvestmentTypeByName(equityItem.getInvestmentType());
+            if (investmentType == null) {
+                return new Error(Response.Status.BAD_REQUEST, null, "Invalid investment type");
+            }
+        }
+        InvestmentItem item = investmentRepository.updateEquity(EquityNumber, equityItem, investmentType);
+        if (item == null) {
+            return new Error(Response.Status.INTERNAL_SERVER_ERROR, null, null);
+        }
+        return new Success(Response.Status.OK, null, item);
+    }
+
+
+    @Override
+    public NetworkResponse deleteEquityItem(String equityNumber) {
+        try {
+            investmentRepository.deleteEquity(equityNumber);
+        } catch (NotFoundException exception) {
+            return new Exception(Response.Status.BAD_REQUEST, exception, null);
+        }
+        return new Success(Response.Status.OK, null, "Equity with equity number " + equityNumber + " deleted successfully");
     }
 
 

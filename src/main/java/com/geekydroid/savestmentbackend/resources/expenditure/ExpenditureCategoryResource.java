@@ -1,6 +1,7 @@
 package com.geekydroid.savestmentbackend.resources.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategoryResponse;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureCategoryService;
 
 import javax.inject.Inject;
@@ -22,5 +23,11 @@ public class ExpenditureCategoryResource {
     @GET
     public List<ExpenditureCategory> getAllCategories() {
         return service.getAllExpenditureCategories();
+    }
+
+    @GET()
+    @Path("/get")
+    public List<ExpenditureCategoryResponse> getExpenditureCategories() {
+        return service.getExpenditureCategoryResponse();
     }
 }

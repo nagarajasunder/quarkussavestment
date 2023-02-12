@@ -1,6 +1,7 @@
 package com.geekydroid.savestmentbackend.service.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategoryResponse;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureCategoryRepository;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -23,5 +24,10 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
     @Override
     public ExpenditureCategory getExpenditureCategoryByName(String expenditureCategoryStr) {
         return repository.getExpenditureCategoryName(expenditureCategoryStr);
+    }
+
+    @Override
+    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse() {
+        return repository.getExpenditureCategoryResponse();
     }
 }

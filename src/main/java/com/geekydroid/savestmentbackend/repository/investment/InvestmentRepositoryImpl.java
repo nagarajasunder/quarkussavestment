@@ -58,5 +58,10 @@ public class InvestmentRepositoryImpl implements InvestmentRepository{
         return InvestmentItem.listAll();
     }
 
+    @Override
+    public InvestmentItem findInvestmentItemById(String investmentNumber) {
+        return InvestmentItem.findById(investmentNumber);
+    }
+
 
 }

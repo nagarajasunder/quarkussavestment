@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.service.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureOverview;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureRequest;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
@@ -15,6 +16,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -95,5 +97,15 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 null
         );
 
+    }
+
+    @Override
+    public ExpenditureOverview getExpenditureOverview(String startDate,String endDate) {
+
+        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startDate,endDate);
+
+        System.out.println(totalExpenditures);
+
+        return null;
     }
 }

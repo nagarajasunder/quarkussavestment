@@ -1,11 +1,13 @@
 package com.geekydroid.savestmentbackend.domain.expenditure;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "EXPENDITURE_TYPE")
-public class ExpenditureType {
+public class ExpenditureType extends PanacheEntityBase {
 
     @SequenceGenerator(
             name = "expenditure_type_id_generator",

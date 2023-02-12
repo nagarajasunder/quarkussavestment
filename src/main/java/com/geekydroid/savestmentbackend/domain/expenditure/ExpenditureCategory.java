@@ -20,6 +20,7 @@ public class ExpenditureCategory extends PanacheEntityBase {
             generator = "expenditure_category_id_generator",
             strategy = GenerationType.IDENTITY
     )
+    @Column(name = "expenditure_category_id")
     private Long expenditureCategoryId;
 
     @OneToOne
