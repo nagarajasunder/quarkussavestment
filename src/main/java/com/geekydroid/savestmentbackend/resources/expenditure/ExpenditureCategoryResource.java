@@ -20,13 +20,12 @@ public class ExpenditureCategoryResource {
     @Inject
     ExpenditureCategoryService service;
 
-    @GET
-    public List<ExpenditureCategory> getAllCategories() {
-        return service.getAllExpenditureCategories();
-    }
+//    @GET
+//    public List<ExpenditureCategory> getAllCategories() {
+//        return service.getAllExpenditureCategories();
+//    }
 
     @GET()
-    @Path("/get")
     public List<ExpenditureCategoryResponse> getExpenditureCategories() {
         return service.getExpenditureCategoryResponse();
     }

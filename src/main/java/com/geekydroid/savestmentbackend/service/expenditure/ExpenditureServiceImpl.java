@@ -1,5 +1,6 @@
 package com.geekydroid.savestmentbackend.service.expenditure;
 
+import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
@@ -11,8 +12,10 @@ import com.geekydroid.savestmentbackend.utils.models.Success;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -118,5 +121,49 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     @Override
     public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String startDate, String endDate) {
         return repository.getExpenditureByGivenDateRange(startDate, endDate);
+    }
+
+    @Override
+    public NetworkResponse getExpenditureByExpNumber(String expNumber) {
+        if (expNumber.isEmpty()) {
+            return new com.geekydroid.savestmentbackend.utils.models.Error(
+                    Response.Status.BAD_REQUEST,
+                    new java.lang.Exception("The expenditure number cannot be empty"),
+                    null
+            );
+        }
+        Expenditure expenditure = repository.getExpenditureByExpNumber(expNumber);
+        if (expenditure == null) {
+            return new com.geekydroid.savestmentbackend.utils.models.Error(
+                    Response.Status.BAD_REQUEST,
+                    new NotFoundException("The expenditure with expenditure number " + expNumber + " does not exist"),
+                    null
+            );
+        }
+        ExpenditureItem expenditureItem = new ExpenditureItem(
+                expenditure.getExpenditureNumber(),
+                expenditure.getExpenditureDate(),
+                expenditure.getExpenditureDescription(),
+                expenditure.getExpenditureCategory().getCategoryName(),
+                expenditure.getExpenditureCategory().getExpenditureType().getExpenditureName(),
+                expenditure.getExpenditureAmount(),
+                expenditure.getPaymode()
+
+        );
+        return new Success(Response.Status.OK, null, expenditureItem);
+    }
+
+    @Override
+    public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(String expenditureType, Paymode paymode, String fromDate, String toDate, String expenditureCategoryStr) {
+
+        List<String> expenditureCategories = Arrays.stream(expenditureCategoryStr.split(",")).toList();
+
+        return repository.getExpenditureItemBasedOnGivenFilters(
+                expenditureType,
+                paymode,
+                fromDate,
+                toDate,
+                expenditureCategories
+        );
     }
 }

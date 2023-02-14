@@ -1,6 +1,8 @@
 package com.geekydroid.savestmentbackend.resources.expenditure;
 
+import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureOverview;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureRequest;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureCategoryService;
@@ -68,4 +70,20 @@ public class ExpenditureResource {
         return expenditureService.getExpenditureOverview(startDate, endDate);
     }
 
+    @GET()
+    public Response getExpenditureByExpenditureNumber(@QueryParam("expNumber") String expNumber) {
+        return ResponseUtil.getResponseFromResult(expenditureService.getExpenditureByExpNumber(expNumber));
+    }
+
+    @GET()
+    @Path("/filterBy")
+    public List<ExpenditureItem> getExpenditureBasedOnFilters(
+            @QueryParam("expenditureType") String expenditureType,
+            @QueryParam("paymode") Paymode paymode,
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("expenditureCategory") String expenditureCategory
+    ) {
+        return expenditureService.getExpenditureItemBasedOnGivenFilters(expenditureType, paymode, fromDate, toDate, expenditureCategory);
+    }
 }

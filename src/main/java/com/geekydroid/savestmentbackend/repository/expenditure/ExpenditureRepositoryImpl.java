@@ -1,13 +1,11 @@
 package com.geekydroid.savestmentbackend.repository.expenditure;
 
-import com.geekydroid.savestmentbackend.domain.enums.DateFormat;
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
-import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.converters.PaymodeConverters;
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
@@ -129,6 +127,72 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                                 .eq(DSL.field("EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID"))
                 )
                 .where(DSL.field("TO_CHAR(EXPENDITURE.DATE_OF_EXPENDITURE,'YYYY/MM/DD')").between(startDate, endDate))
+                .fetchInto(ExpenditureItem.class);
+        System.out.println(result);
+        return result;
+    }
+
+    @Override
+    public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
+            String expenditureType,
+            Paymode paymode,
+            String fromDate,
+            String toDate,
+            List<String> expenditureCategories
+    ) {
+        Condition expenditureTypeFilter = DSL.condition("1=1");
+        if (!expenditureType.isEmpty()) {
+            expenditureTypeFilter = DSL.field("EXPENDITURE_TYPE.EXPENDITURE_NAME").eq(expenditureTypeFilter);
+        }
+
+        Condition fromDateFilter = DSL.condition("1=1");
+
+        if (!fromDate.isEmpty()) {
+            fromDateFilter = DSL.field("EXPENDITURE.DATE_OF_EXPENDITURE").greaterOrEqual(fromDate);
+        }
+
+        Condition toDateFilter = DSL.condition("1=1");
+
+        if (!toDate.isEmpty()) {
+            toDateFilter = DSL.field("EXPENDITURE.DATE_OF_EXPENDITURE").lessOrEqual(toDate);
+        }
+
+        Condition paymodeFilter = DSL.condition("1=1");
+        if (paymode != null) {
+            paymodeFilter = DSL.field("EXPENDITURE.MODE_OF_PAYMENT",SQLDataType.INTEGER.asConvertedDataType(PaymodeConverters.getConverter())).eq(paymode);
+        }
+
+        Condition expenditureCategoryFilter = DSL.condition("1=1");
+        if (expenditureCategories.size() > 0) {
+            expenditureCategoryFilter = DSL.field("EXPENDITURE_CATEGORY.CATEGORY_NAME").in(expenditureCategories);
+        }
+
+
+        List<ExpenditureItem> result = context.select(
+                        (DSL.field("EXPENDITURE.EXPENDITURE_NUMBER", SQLDataType.VARCHAR)).as("expenditureNumber"),
+                        DSL.field("EXPENDITURE.DATE_OF_EXPENDITURE", SQLDataType.DATE).as("expenditureDate"),
+                        DSL.field("EXPENDITURE.EXPENDITURE_DESCRIPTION", SQLDataType.VARCHAR).as("expenditureDescription"),
+                        DSL.field("EXPENDITURE_CATEGORY.CATEGORY_NAME", SQLDataType.VARCHAR).as("expenditureCategory"),
+                        DSL.field("EXPENDITURE_TYPE.EXPENDITURE_NAME", SQLDataType.VARCHAR).as("expenditureType"),
+                        DSL.field("EXPENDITURE.EXPENDITURE_AMOUNT", SQLDataType.DOUBLE).as("expenditureAmount"),
+                        DSL.field("EXPENDITURE.MODE_OF_PAYMENT", SQLDataType.INTEGER.asConvertedDataType(PaymodeConverters.getConverter())).as("paymode")
+                ).from(DSL.table("EXPENDITURE"))
+                .leftJoin(DSL.table("EXPENDITURE_CATEGORY"))
+                .on(
+                        DSL.field("EXPENDITURE.EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID")
+                                .eq(DSL.field("EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID"))
+                ).leftJoin(
+                        DSL.table("EXPENDITURE_TYPE")
+                ).on(
+                        DSL.field("EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID")
+                                .eq(DSL.field("EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID"))
+                )
+                .where(DSL.field("TO_CHAR(EXPENDITURE.DATE_OF_EXPENDITURE,'YYYY/MM/DD')").between(fromDate, toDate))
+                .and(expenditureTypeFilter)
+                .and(paymodeFilter)
+                .and(fromDateFilter)
+                .and(toDateFilter)
+                .and(expenditureCategoryFilter)
                 .fetchInto(ExpenditureItem.class);
         System.out.println(result);
         return result;
