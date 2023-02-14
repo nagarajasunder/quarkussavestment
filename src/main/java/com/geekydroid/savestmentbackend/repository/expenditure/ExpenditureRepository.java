@@ -1,6 +1,7 @@
 package com.geekydroid.savestmentbackend.repository.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
@@ -19,4 +20,6 @@ public interface ExpenditureRepository {
     Expenditure getExpenditureByExpNumber(String expNumber);
 
     List<Double> getTotalExpenseAndIncomeAmount(String startDate, String endDate);
+
+    List<ExpenditureItem> getExpenditureByGivenDateRange(String startDate, String endDate);
 }

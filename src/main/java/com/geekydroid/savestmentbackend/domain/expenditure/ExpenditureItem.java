@@ -2,10 +2,12 @@ package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 
+import java.time.LocalDate;
+
 public class ExpenditureItem {
 
     private String expenditureNumber;
-    private String expenditureDate;
+    private LocalDate expenditureDate;
     private String expenditureDescription;
     private String expenditureCategory;
     private String expenditureType;
@@ -14,7 +16,7 @@ public class ExpenditureItem {
 
     public ExpenditureItem(
             String expenditureNumber,
-            String expenditureDate,
+            LocalDate expenditureDate,
             String expenditureDescription,
             String expenditureCategory,
             String expenditureType,
@@ -41,11 +43,11 @@ public class ExpenditureItem {
         this.expenditureNumber = expenditureNumber;
     }
 
-    public String getExpenditureDate() {
+    public LocalDate getExpenditureDate() {
         return expenditureDate;
     }
 
-    public void setExpenditureDate(String expenditureDate) {
+    public void setExpenditureDate(LocalDate expenditureDate) {
         this.expenditureDate = expenditureDate;
     }
 

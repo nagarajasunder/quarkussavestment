@@ -6,6 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class Expenditure extends PanacheEntityBase {
     private Paymode paymode;
 
     @Column(name = "date_of_expenditure")
-    private LocalDateTime expenditureDate;
+    private LocalDate expenditureDate;
 
     @Column(name = "created_by")
     private UUID createdBy;
@@ -60,7 +61,7 @@ public class Expenditure extends PanacheEntityBase {
                     Double expenditureAmount,
                     String expenditureDescription,
                     Paymode paymode,
-                    LocalDateTime expenditureDate,
+                    LocalDate expenditureDate,
                     UUID createdBy,
                     LocalDateTime createdOn,
                     LocalDateTime updatedOn
@@ -110,11 +111,11 @@ public class Expenditure extends PanacheEntityBase {
         this.paymode = paymode;
     }
 
-    public LocalDateTime getExpenditureDate() {
+    public LocalDate getExpenditureDate() {
         return expenditureDate;
     }
 
-    public void setExpenditureDate(LocalDateTime expenditureDate) {
+    public void setExpenditureDate(LocalDate expenditureDate) {
         this.expenditureDate = expenditureDate;
     }
 
@@ -148,5 +149,20 @@ public class Expenditure extends PanacheEntityBase {
 
     public void setExpenditureCategory(ExpenditureCategory expenditureCategory) {
         this.expenditureCategory = expenditureCategory;
+    }
+
+    @Override
+    public String toString() {
+        return "Expenditure{" +
+                "expenditureNumber='" + expenditureNumber + '\'' +
+                ", expenditureCategory=" + expenditureCategory +
+                ", expenditureAmount=" + expenditureAmount +
+                ", expenditureDescription='" + expenditureDescription + '\'' +
+                ", paymode=" + paymode +
+                ", expenditureDate=" + expenditureDate +
+                ", createdBy=" + createdBy +
+                ", createdOn=" + createdOn +
+                ", updatedOn=" + updatedOn +
+                '}';
     }
 }

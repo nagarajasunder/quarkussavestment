@@ -65,8 +65,7 @@ public class ExpenditureResource {
             @QueryParam("startDate") String startDate,
             @QueryParam("endDate") String endDate
     ) {
-        expenditureService.getExpenditureOverview(startDate,endDate);
-        return null;
+        return expenditureService.getExpenditureOverview(startDate, endDate);
     }
 
 }

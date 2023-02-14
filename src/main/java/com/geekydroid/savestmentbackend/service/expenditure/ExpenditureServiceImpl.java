@@ -1,15 +1,12 @@
 package com.geekydroid.savestmentbackend.service.expenditure;
 
-import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureOverview;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureRequest;
+import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
+import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.Success;
-import com.geekydroid.utils.DateUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -36,7 +33,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 expenditureRequest.getAmount(),
                 expenditureRequest.getNotes(),
                 expenditureRequest.getPaymode(),
-                DateUtils.fromStringToDateTime(expenditureRequest.getExpenditureDate()),
+                DateUtils.fromStringToLocalDate(expenditureRequest.getExpenditureDate()),
                 UUID.fromString(expenditureRequest.getCreatedBy()),
                 now,
                 now
@@ -58,7 +55,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
             expenditure.setExpenditureAmount(expenditureRequest.getAmount());
         }
         if (expenditureRequest.getExpenditureDate() != null) {
-            expenditure.setExpenditureDate(DateUtils.fromStringToDateTime(expenditureRequest.getExpenditureDate()));
+            expenditure.setExpenditureDate(DateUtils.fromStringToLocalDate(expenditureRequest.getExpenditureDate()));
         }
         if (expenditureRequest.getExpenditureCategory() != null && !expenditureRequest.getExpenditureCategory().isEmpty()) {
             ExpenditureCategory category = expenditureCategoryService.getExpenditureCategoryByName(expenditureRequest.getExpenditureCategory());
@@ -100,12 +97,26 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public ExpenditureOverview getExpenditureOverview(String startDate,String endDate) {
+    public ExpenditureOverview getExpenditureOverview(String startDate, String endDate) {
 
-        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startDate,endDate);
+        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startDate, endDate);
+        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate);
 
-        System.out.println(totalExpenditures);
+        ExpenditureOverview overview = new ExpenditureOverview(
+                totalExpenditures.get(0),
+                totalExpenditures.get(1),
+                totalExpenditures.get(0) + totalExpenditures.get(1),
+                expenditureItems
 
-        return null;
+        );
+
+        System.out.println(overview);
+
+        return overview;
+    }
+
+    @Override
+    public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String startDate, String endDate) {
+        return repository.getExpenditureByGivenDateRange(startDate, endDate);
     }
 }
