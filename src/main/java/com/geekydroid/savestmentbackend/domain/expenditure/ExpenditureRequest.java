@@ -2,11 +2,14 @@ package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 public class ExpenditureRequest {
 
-
+    @JsonbProperty(value = "expenditure_type")
     private String expenditureType;
     private String expenditureDate;
+    @JsonbProperty(value = "expenditure_category")
     private String expenditureCategory;
     private Double amount;
     private Paymode paymode;
