@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.geekydroid.savestment.domain.db.Tables.EXPENDITURE_CATEGORY;
+import static com.geekydroid.savestment.domain.db.Tables.EXPENDITURE_TYPE;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
@@ -37,7 +39,8 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
 
     @Override
     public List<ExpenditureCategory> getAllExpenditureCategories() {
-        return context.select().from(table("EXPENDITURE_CATEGORY")).fetchInto(ExpenditureCategory.class);
+        return context.select()
+                .from(EXPENDITURE_CATEGORY).fetchInto(ExpenditureCategory.class);
     }
 
     @Override
@@ -47,7 +50,10 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
 
     @Override
     public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse() {
-        List<String> expenditureTypeNames = context.select(field("expenditure_name")).from(table("EXPENDITURE_TYPE")).fetchInto(String.class);
+        List<String> expenditureTypeNames = context
+                .select(EXPENDITURE_TYPE.EXPENDITURE_NAME)
+                .from(EXPENDITURE_TYPE)
+                .fetchInto(String.class);
         HashMap<String, ExpenditureCategoryResponse> expenditureCategoryMap = new HashMap<>();
 
         for (String expenditureTypeName : expenditureTypeNames) {
@@ -55,16 +61,16 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
         }
         System.out.println("Map size "+expenditureCategoryMap.size());
 
-        Result<Record2<Object, Object>> expenditureCategories = context.select(
-                        field("EXPENDITURE_TYPE.expenditure_name"),
-                        field("EXPENDITURE_CATEGORY.category_name")
-                ).from(table("EXPENDITURE_TYPE"))
-                .join(table("EXPENDITURE_CATEGORY"))
-                .on(field("EXPENDITURE_TYPE.expenditure_type_id").eq(field("EXPENDITURE_CATEGORY.expenditure_type_expenditure_type_id"))).fetch();
+        Result<Record2<String, String>> expenditureCategories = context.select(
+                EXPENDITURE_TYPE.EXPENDITURE_NAME,
+                        EXPENDITURE_CATEGORY.CATEGORY_NAME)
+                .from(EXPENDITURE_TYPE)
+                .join(EXPENDITURE_CATEGORY)
+                .on(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID)).fetch();
 
         for (Record r : expenditureCategories) {
-            String expenditureTypeName = r.getValue(field("EXPENDITURE_TYPE.expenditure_name")).toString();
-            String expenditureCategoryName = r.getValue(field("EXPENDITURE_CATEGORY.category_name")).toString();
+            String expenditureTypeName = r.getValue(EXPENDITURE_TYPE.EXPENDITURE_NAME);
+            String expenditureCategoryName = r.getValue(EXPENDITURE_CATEGORY.CATEGORY_NAME);
             ExpenditureCategoryResponse response = expenditureCategoryMap.get(expenditureTypeName);
             response.addExpenditureCategory(expenditureCategoryName);
         }

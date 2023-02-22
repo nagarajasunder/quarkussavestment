@@ -1,5 +1,19 @@
--- This file allow to write SQL commands that will be emitted in test and dev.
--- The commands are commented as their support depends of the database
--- insert into myentity (id, field) values(nextval('hibernate_sequence'), 'field-1');
--- insert into myentity (id, field) values(nextval('hibernate_sequence'), 'field-2');
--- insert into myentity (id, field) values(nextval('hibernate_sequence'), 'field-3');
+INSERT INTO EXPENDITURE_TYPE (EXPENDITURE_TYPE_ID,EXPENDITURE_NAME,CREATED_ON,UPDATED_ON)
+VALUES (1,'Income',now(),now()),(2,'Expense',now(),now());
+
+
+INSERT INTO EXPENDITURE_CATEGORY
+(
+	EXPENDITURE_CATEGORY_ID,
+    EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID,
+    CATEGORY_NAME,
+    CREATED_ON,
+    UPDATED_ON
+)
+VALUES (1,1,'Salary',now(),now()), (2,2,'Rent',now(),now()), (3,2,'Food',now(),now()), (4,2,'Electricity',now(),now());
+
+INSERT INTO EXPENDITURE (EXPENDITURE_NUMBER,EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID,EXPENDITURE_AMOUNT,EXPENDITURE_DESCRIPTION,MODE_OF_PAYMENT,DATE_OF_EXPENDITURE,CREATED_ON,UPDATED_ON) VALUES
+('EXP-25',1,45000,'Monthly Salary',0,'2023-02-01',now(),now()),
+('EXP-23',2,4400,'Monthly Rent',0,'2023-02-04',now(),now()),
+('EXP-21',3,599,'Breakfast',0,'2023-02-14',now(),now()),
+('EXP-20',3,45,'Dinner',1,'2023-01-12',now(),now());

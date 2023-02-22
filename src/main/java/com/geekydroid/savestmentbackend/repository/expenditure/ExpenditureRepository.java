@@ -21,15 +21,15 @@ public interface ExpenditureRepository {
 
     Expenditure getExpenditureByExpNumber(String expNumber);
 
-    List<Double> getTotalExpenseAndIncomeAmount(String startDate, String endDate);
+    List<Double> getTotalExpenseAndIncomeAmount(LocalDate startDate, LocalDate endDate);
 
-    List<ExpenditureItem> getExpenditureByGivenDateRange(String startDate, String endDate);
+    List<ExpenditureItem> getExpenditureByGivenDateRange(LocalDate startDate, LocalDate endDate);
 
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
             String expenditureType,
             Paymode paymode,
-            String fromDate,
-            String toDate,
+            LocalDate fromDate,
+            LocalDate toDate,
             List<String> expenditureCategories
     );
 }

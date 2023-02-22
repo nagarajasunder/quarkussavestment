@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -102,7 +103,10 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     @Override
     public ExpenditureOverview getExpenditureOverview(String startDate, String endDate) {
 
-        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startDate, endDate);
+        LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
+        LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
+
+        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startLocalDate, endLocalDate);
         List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate);
 
         ExpenditureOverview overview = new ExpenditureOverview(
@@ -120,7 +124,11 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
     @Override
     public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String startDate, String endDate) {
-        return repository.getExpenditureByGivenDateRange(startDate, endDate);
+
+        LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
+        LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
+
+        return repository.getExpenditureByGivenDateRange(startLocalDate, endLocalDate);
     }
 
     @Override
@@ -158,11 +166,15 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
         List<String> expenditureCategories = Arrays.stream(expenditureCategoryStr.split(",")).toList();
 
+        LocalDate startLocalDate = DateUtils.fromStringToLocalDate(fromDate);
+        LocalDate endLocalDate = DateUtils.fromStringToLocalDate(toDate);
+
+
         return repository.getExpenditureItemBasedOnGivenFilters(
                 expenditureType,
                 paymode,
-                fromDate,
-                toDate,
+                startLocalDate,
+                endLocalDate,
                 expenditureCategories
         );
     }
