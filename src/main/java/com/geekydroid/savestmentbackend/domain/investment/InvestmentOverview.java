@@ -6,9 +6,9 @@ public class InvestmentOverview {
 
     private List<InvestmentTypeOverview> investmentTypeOverview;
 
-    private List<InvestmentItem> recentInvestments;
+    private List<EquityItem> recentInvestments;
 
-    public InvestmentOverview(List<InvestmentTypeOverview> investmentTypeOverview, List<InvestmentItem> recentInvestments) {
+    public InvestmentOverview(List<InvestmentTypeOverview> investmentTypeOverview, List<EquityItem> recentInvestments) {
         this.investmentTypeOverview = investmentTypeOverview;
         this.recentInvestments = recentInvestments;
     }
@@ -21,11 +21,11 @@ public class InvestmentOverview {
         this.investmentTypeOverview = investmentTypeOverview;
     }
 
-    public List<InvestmentItem> getRecentInvestments() {
+    public List<EquityItem> getRecentInvestments() {
         return recentInvestments;
     }
 
-    public void setRecentInvestments(List<InvestmentItem> recentInvestments) {
+    public void setRecentInvestments(List<EquityItem> recentInvestments) {
         this.recentInvestments = recentInvestments;
     }
 

@@ -5,6 +5,7 @@ import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentTypeOverview;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface InvestmentRepository {
@@ -19,6 +20,7 @@ public interface InvestmentRepository {
 
     InvestmentItem findInvestmentItemById(String investmentNumber);
 
-    List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(String startDate,String endDate);
+    List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate);
 
+    List<EquityItem> getEquityItemsGivenDateRange(LocalDate localStartDate, LocalDate localEndDate);
 }

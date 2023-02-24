@@ -13,4 +13,6 @@ public interface InvestmentService {
     NetworkResponse updateEquityItems(String EquityNumber,EquityItem equityItem);
 
     NetworkResponse deleteEquityItem(String equityNumber);
+
+    NetworkResponse getInvestmentOverview(String startDate, String endDate);
 }

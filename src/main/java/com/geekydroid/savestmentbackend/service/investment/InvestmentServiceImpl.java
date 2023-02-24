@@ -1,19 +1,20 @@
 package com.geekydroid.savestmentbackend.service.investment;
 
-import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
+import com.geekydroid.savestmentbackend.domain.investment.*;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentRepository;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentTypeRepository;
+import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
+import org.jboss.resteasy.reactive.common.util.DateUtil;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +100,18 @@ public class InvestmentServiceImpl implements InvestmentService {
             return new Exception(Response.Status.BAD_REQUEST, exception, null);
         }
         return new Success(Response.Status.OK, null, "Equity with equity number " + equityNumber + " deleted successfully");
+    }
+
+    @Override
+    public NetworkResponse getInvestmentOverview(String startDate, String endDate) {
+        LocalDate localStartDate = DateUtils.fromStringToLocalDate(startDate);
+        LocalDate localEndDate = DateUtils.fromStringToLocalDate(endDate);
+
+        List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate,localEndDate);
+        List<EquityItem> recentEquityData =  investmentRepository.getEquityItemsGivenDateRange(localStartDate,localEndDate);
+        InvestmentOverview investmentOverview = new InvestmentOverview(overviews,recentEquityData);
+        return new Success(Response.Status.OK,null,investmentOverview);
+
     }
 
 

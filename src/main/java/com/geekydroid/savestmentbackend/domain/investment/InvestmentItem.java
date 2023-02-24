@@ -33,6 +33,7 @@ public class InvestmentItem extends PanacheEntityBase {
             generator = "investment_number_seq",
             strategy = GenerationType.SEQUENCE
     )
+    @Column(name = "INVESTMENT_ID")
     private String investmentId;
 
     @OneToOne

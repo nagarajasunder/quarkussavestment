@@ -41,5 +41,10 @@ public class InvestmentResource {
         return ResponseUtil.getResponseFromResult(investmentService.deleteEquityItem(equityNumber));
     }
 
+    @GET()
+    @Path("/overview")
+    public Response getInvestmentOverview(@QueryParam("startDate") String startDate,@QueryParam("endDate") String endDate) {
+        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate,endDate));
+    }
 
 }
