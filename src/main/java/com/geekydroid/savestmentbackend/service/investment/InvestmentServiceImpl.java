@@ -7,7 +7,6 @@ import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
-import org.jboss.resteasy.reactive.common.util.DateUtil;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @ApplicationScoped
 @Transactional
@@ -31,7 +31,6 @@ public class InvestmentServiceImpl implements InvestmentService {
 
     @Override
     public NetworkResponse addEquityItems(List<EquityItem> equityItems) {
-        System.out.println(equityItems.toString());
         List<InvestmentItem> investmentItems = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         for (EquityItem equityItem : equityItems) {
@@ -109,7 +108,9 @@ public class InvestmentServiceImpl implements InvestmentService {
 
         List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate,localEndDate);
         List<EquityItem> recentEquityData =  investmentRepository.getEquityItemsGivenDateRange(localStartDate,localEndDate);
-        InvestmentOverview investmentOverview = new InvestmentOverview(overviews,recentEquityData);
+        AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
+        overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
+        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(),overviews,recentEquityData);
         return new Success(Response.Status.OK,null,investmentOverview);
 
     }

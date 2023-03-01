@@ -27,7 +27,7 @@ public interface ExpenditureRepository {
 
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
             String expenditureType,
-            Paymode paymode,
+            List<Paymode> paymodes,
             LocalDate fromDate,
             LocalDate toDate,
             List<String> expenditureCategories

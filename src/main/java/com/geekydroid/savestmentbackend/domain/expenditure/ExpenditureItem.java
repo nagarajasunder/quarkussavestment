@@ -7,15 +7,25 @@ import java.time.LocalDate;
 
 public class ExpenditureItem {
 
-    @JsonbProperty(value = "expenditure_number")
+    @JsonbProperty(value = "exp_number")
     private String expenditureNumber;
+
+    @JsonbProperty(value = "expenditure_date")
     private LocalDate expenditureDate;
 
     @JsonbProperty("expenditure_description")
     private String expenditureDescription;
+
+    @JsonbProperty("expenditure_category")
     private String expenditureCategory;
+
+    @JsonbProperty("expenditure_type")
     private String expenditureType;
+
+    @JsonbProperty("expenditure_amount")
     private Double expenditureAmount;
+
+    @JsonbProperty("pay_mode")
     private Paymode paymode;
 
     public ExpenditureItem(

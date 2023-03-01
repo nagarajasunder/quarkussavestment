@@ -59,7 +59,7 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
         for (String expenditureTypeName : expenditureTypeNames) {
             expenditureCategoryMap.put(expenditureTypeName, new ExpenditureCategoryResponse(expenditureTypeName, new ArrayList<>()));
         }
-        System.out.println("Map size "+expenditureCategoryMap.size());
+
 
         Result<Record2<String, String>> expenditureCategories = context.select(
                 EXPENDITURE_TYPE.EXPENDITURE_NAME,

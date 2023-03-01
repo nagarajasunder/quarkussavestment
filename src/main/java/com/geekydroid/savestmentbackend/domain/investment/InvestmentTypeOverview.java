@@ -1,10 +1,15 @@
 package com.geekydroid.savestmentbackend.domain.investment;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 public class InvestmentTypeOverview {
 
+    @JsonbProperty(value = "investment_type")
     private String investmentType;
+    @JsonbProperty("total_buy_value")
     private Double totalBuyAmount;
 
+    @JsonbProperty(value = "total_sell_value")
     private Double totalSellAmount;
 
     public InvestmentTypeOverview(String investmentType, Double totalBuyAmount, Double totalSellAmount) {

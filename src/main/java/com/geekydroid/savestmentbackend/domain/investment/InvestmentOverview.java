@@ -1,14 +1,20 @@
 package com.geekydroid.savestmentbackend.domain.investment;
 
+import javax.json.bind.annotation.JsonbProperty;
 import java.util.List;
 
 public class InvestmentOverview {
 
+    @JsonbProperty("total_investment_amount")
+    private Double totalInvestments;
+    @JsonbProperty(value = "investment_type_overview")
     private List<InvestmentTypeOverview> investmentTypeOverview;
 
+    @JsonbProperty(value = "recent_investments")
     private List<EquityItem> recentInvestments;
 
-    public InvestmentOverview(List<InvestmentTypeOverview> investmentTypeOverview, List<EquityItem> recentInvestments) {
+    public InvestmentOverview(Double totalInvestments,List<InvestmentTypeOverview> investmentTypeOverview, List<EquityItem> recentInvestments) {
+        this.totalInvestments = totalInvestments;
         this.investmentTypeOverview = investmentTypeOverview;
         this.recentInvestments = recentInvestments;
     }
@@ -27,6 +33,14 @@ public class InvestmentOverview {
 
     public void setRecentInvestments(List<EquityItem> recentInvestments) {
         this.recentInvestments = recentInvestments;
+    }
+
+    public Double getTotalInvestments() {
+        return totalInvestments;
+    }
+
+    public void setTotalInvestments(Double totalInvestments) {
+        this.totalInvestments = totalInvestments;
     }
 
     @Override

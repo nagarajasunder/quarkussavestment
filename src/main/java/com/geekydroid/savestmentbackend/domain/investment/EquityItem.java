@@ -2,36 +2,42 @@ package com.geekydroid.savestmentbackend.domain.investment;
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
 
+import javax.json.bind.annotation.JsonbProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class EquityItem {
 
-
+    @JsonbProperty("investment_type")
     private String investmentType;
+
+    @JsonbProperty("symbol")
     private String symbol;
 
-
+    @JsonbProperty("trade_date")
     private LocalDate tradeDate;
 
+    @JsonbProperty("trade_type")
 
     private TradeType tradeType;
 
+    @JsonbProperty("quantity")
     private Double quantity;
 
+    @JsonbProperty("price")
     private Double price;
 
-
+    @JsonbProperty("amount_invested")
     private Double amountInvested;
 
-
+    @JsonbProperty("created_by")
     private UUID createdBy;
 
-
+    @JsonbProperty("created_on")
     private LocalDateTime createdOn;
 
-
+    @JsonbProperty("updated_on")
     private LocalDateTime updatedOn;
 
     public EquityItem(

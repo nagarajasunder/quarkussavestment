@@ -16,6 +16,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,8 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     @Override
     public NetworkResponse createExpenditure(ExpenditureRequest expenditureRequest, ExpenditureCategory expenditureCategory) {
         LocalDateTime now = LocalDateTime.now();
+        //Todo("To be removed")
+        expenditureRequest.setCreatedBy(UUID.randomUUID().toString());
         Expenditure newExpenditure = new Expenditure(
                 expenditureCategory,
                 expenditureRequest.getAmount(),
@@ -109,17 +112,15 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startLocalDate, endLocalDate);
         List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate);
 
-        ExpenditureOverview overview = new ExpenditureOverview(
+        Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
+
+        return new ExpenditureOverview(
+                totalExpenditure,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
-                totalExpenditures.get(0) + totalExpenditures.get(1),
                 expenditureItems
 
         );
-
-        System.out.println(overview);
-
-        return overview;
     }
 
     @Override
@@ -162,20 +163,31 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(String expenditureType, Paymode paymode, String fromDate, String toDate, String expenditureCategoryStr) {
+    public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
+            ExpenditureFilterRequest request
+    ) {
+        LocalDate startLocalDate = null;
+        LocalDate endLocalDate = null;
+        if (request.getFromDate() != null && !request.getFromDate().isEmpty()) {
+            startLocalDate = DateUtils.fromStringToLocalDate(request.getFromDate());
+        }
 
-        List<String> expenditureCategories = Arrays.stream(expenditureCategoryStr.split(",")).toList();
+        if (request.getToDate() != null && !request.getToDate().isEmpty()) {
+            endLocalDate = DateUtils.fromStringToLocalDate(request.getToDate());
+        }
 
-        LocalDate startLocalDate = DateUtils.fromStringToLocalDate(fromDate);
-        LocalDate endLocalDate = DateUtils.fromStringToLocalDate(toDate);
+        List<Paymode> paymodes = new ArrayList<>();
+        if (request.getPaymodes() != null && request.getPaymodes().size() > 0) {
+            paymodes = request.getPaymodes().stream().map(paymode -> Paymode.valueOf(paymode.toUpperCase())).toList();
+        }
 
 
         return repository.getExpenditureItemBasedOnGivenFilters(
-                expenditureType,
-                paymode,
+                request.getExpenditureType(),
+                paymodes,
                 startLocalDate,
                 endLocalDate,
-                expenditureCategories
+                request.getCategories()
         );
     }
 }

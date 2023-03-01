@@ -27,10 +27,6 @@ public interface ExpenditureService {
     NetworkResponse getExpenditureByExpNumber(String expNumber);
 
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
-            String expenditureType,
-            Paymode paymode,
-            String fromDate,
-            String toDate,
-            String expenditureCategoryStr
+            ExpenditureFilterRequest request
     );
 }

@@ -8,12 +8,21 @@ public class ExpenditureRequest {
 
     @JsonbProperty(value = "expenditure_type")
     private String expenditureType;
+
+    @JsonbProperty("expenditure_date")
     private String expenditureDate;
     @JsonbProperty(value = "expenditure_category")
     private String expenditureCategory;
+    @JsonbProperty(value = "expenditure_amount")
     private Double amount;
+
+    @JsonbProperty(value = "pay_mode")
     private Paymode paymode;
+
+    @JsonbProperty(value = "notes")
     private String notes;
+
+    @JsonbProperty(value = "created_by")
     private String createdBy;
 
     public ExpenditureRequest() {

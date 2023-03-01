@@ -1,10 +1,7 @@
 package com.geekydroid.savestmentbackend.resources.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureOverview;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureRequest;
+import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureCategoryService;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureService;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
@@ -47,7 +44,6 @@ public class ExpenditureResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateExpenditure(@PathParam(value = "expNumber") String expNumber, ExpenditureRequest expenditureRequest) {
         NetworkResponse response = expenditureService.updateExpenditure(expNumber, expenditureRequest);
-        System.out.println(response.toString());
         return ResponseUtil.getResponseFromResult(response);
     }
 
@@ -75,15 +71,12 @@ public class ExpenditureResource {
         return ResponseUtil.getResponseFromResult(expenditureService.getExpenditureByExpNumber(expNumber));
     }
 
-    @GET()
+    @POST()
     @Path("/filterBy")
     public List<ExpenditureItem> getExpenditureBasedOnFilters(
-            @QueryParam("expenditureType") String expenditureType,
-            @QueryParam("paymode") Paymode paymode,
-            @QueryParam("fromDate") String fromDate,
-            @QueryParam("toDate") String toDate,
-            @QueryParam("expenditureCategory") String expenditureCategory
+            ExpenditureFilterRequest request
     ) {
-        return expenditureService.getExpenditureItemBasedOnGivenFilters(expenditureType, paymode, fromDate, toDate, expenditureCategory);
+
+        return expenditureService.getExpenditureItemBasedOnGivenFilters(request);
     }
 }

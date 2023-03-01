@@ -100,8 +100,8 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             }
         }
         List<Double> expenditureList = new ArrayList<>();
-        expenditureList.add(totalExpense);
-        expenditureList.add(totalIncome);
+        expenditureList.add(0,totalExpense);
+        expenditureList.add(1,totalIncome);
         return expenditureList;
     }
 
@@ -132,7 +132,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     @Override
     public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
             String expenditureType,
-            Paymode paymode,
+            List<Paymode> paymode,
             LocalDate fromDate,
             LocalDate toDate,
             List<String> expenditureCategories
@@ -140,8 +140,8 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
 
         Condition condition = noCondition();
 
-        if (!expenditureType.isEmpty()) {
-            condition = condition.and(EXPENDITURE_TYPE.EXPENDITURE_NAME.eq(expenditureType));
+        if (expenditureType != null && !expenditureType.isEmpty()) {
+            condition = condition.and(EXPENDITURE_TYPE.EXPENDITURE_NAME.equalIgnoreCase(expenditureType));
         }
         if (fromDate != null) {
             condition = condition.and(EXPENDITURE.DATE_OF_EXPENDITURE.greaterOrEqual(fromDate));
@@ -149,15 +149,15 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         if (toDate != null) {
             condition = condition.and(EXPENDITURE.DATE_OF_EXPENDITURE.lessOrEqual(toDate));
         }
-        if (paymode != null) {
-            condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).eq(paymode));
+        if (paymode != null && !paymode.isEmpty()) {
+            condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
         }
 
-        if (expenditureCategories.size() > 0) {
+        if (expenditureCategories != null && expenditureCategories.size() > 0) {
             condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
         }
 
-        List<ExpenditureItem> result = context.select(
+        return context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
                         EXPENDITURE.DATE_OF_EXPENDITURE.as("expenditureDate"),
                         EXPENDITURE.EXPENDITURE_DESCRIPTION.as("expenditureDescription"),
@@ -174,6 +174,5 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                         condition
                 )
                 .fetchInto(ExpenditureItem.class);
-        return result;
     }
 }
