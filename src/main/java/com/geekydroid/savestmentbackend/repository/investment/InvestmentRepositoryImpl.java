@@ -6,10 +6,12 @@ import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentTypeOverview;
+import com.geekydroid.savestmentbackend.utils.Utils;
 import com.geekydroid.savestmentbackend.utils.converters.TradeTypeConverter;
 import org.graalvm.collections.Pair;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -17,6 +19,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_ITEMS;
@@ -42,13 +45,14 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
         if (entity == null) {
             throw new NotFoundException("Equity with equity number " + equityNumber + " does not exist");
         }
+        LocalDateTime now = LocalDateTime.now();
         entity.setInvestmentTypes(investmentType);
         entity.setSymbol(equityItem.getSymbol());
         entity.setUnits(equityItem.getQuantity());
         entity.setPrice(equityItem.getPrice());
         entity.setAmountInvested(equityItem.getAmountInvested());
-        entity.setUpdatedOn(equityItem.getUpdatedOn());
-        entity.setTradeType(equityItem.getTradeType());
+        entity.setUpdatedOn(now);
+        entity.setTradeType(Utils.convertStringToTradeType(equityItem.getTradeType()));
         entity.setTradeDate(equityItem.getTradeDate());
         return entity;
 
@@ -82,14 +86,15 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 .select(
                         INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_name"),
                        sum(
-                               when(dateFilter
-                                               .and(INVESTMENT_ITEMS.TRADE_TYPE.convert(TradeTypeConverter.getConverter()).eq(TradeType.BUY)),
-                                       INVESTMENT_ITEMS.AMOUNT_INVESTED).otherwise(0d)
+                               when(
+                                       dateFilter.and(INVESTMENT_ITEMS.TRADE_TYPE.convert(TradeTypeConverter.getConverter()).eq(TradeType.BUY)),
+                                       INVESTMENT_ITEMS.AMOUNT_INVESTED
+                               ).otherwise(BigDecimal.ZERO)
                        ).as("totalBuySum"),
                         sum(
                                 when(dateFilter
                                                 .and(INVESTMENT_ITEMS.TRADE_TYPE.convert(TradeTypeConverter.getConverter()).eq(TradeType.SELL)),
-                                        INVESTMENT_ITEMS.AMOUNT_INVESTED).otherwise(0d)
+                                        INVESTMENT_ITEMS.AMOUNT_INVESTED).otherwise(BigDecimal.ZERO)
                         ).as("totalSellSum")
                 )
                 .from(INVESTMENT_ITEMS)
@@ -108,13 +113,13 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 INVESTMENT_TYPES.INVESTMENT_NAME,
                 INVESTMENT_ITEMS.SYMBOL,
                 INVESTMENT_ITEMS.TRADE_DATE,
-                INVESTMENT_ITEMS.TRADE_TYPE.convert(TradeTypeConverter.getConverter()),
+                INVESTMENT_ITEMS.TRADE_TYPE.cast(SQLDataType.VARCHAR),
                 INVESTMENT_ITEMS.UNITS,
                 INVESTMENT_ITEMS.PRICE,
                 INVESTMENT_ITEMS.AMOUNT_INVESTED,
                 INVESTMENT_ITEMS.CREATED_BY,
-                INVESTMENT_ITEMS.CREATED_ON,
-                INVESTMENT_ITEMS.UPDATED_ON
+                INVESTMENT_ITEMS.CREATED_ON.cast(SQLDataType.VARCHAR),
+                INVESTMENT_ITEMS.UPDATED_ON.cast(SQLDataType.VARCHAR)
                 )
                 .from(INVESTMENT_ITEMS)
                 .leftJoin(INVESTMENT_TYPES)

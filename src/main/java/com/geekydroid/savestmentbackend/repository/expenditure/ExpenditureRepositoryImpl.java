@@ -1,13 +1,13 @@
 package com.geekydroid.savestmentbackend.repository.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
+import com.geekydroid.savestmentbackend.domain.expenditure.CategoryWiseExpense;
 import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
 import com.geekydroid.savestmentbackend.utils.converters.PaymodeConverters;
 import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import static com.geekydroid.savestment.domain.db.Tables.*;
 import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.sum;
 
 @ApplicationScoped
 @Transactional
@@ -63,16 +64,20 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
 
     @Override
     public List<Double> getTotalExpenseAndIncomeAmount(LocalDate startDate, LocalDate endDate) {
+
+        Condition dateFilter = EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate);
+
         Result<Record2<BigDecimal, String>> result = context
                 .select(
-                        DSL.sum(EXPENDITURE.EXPENDITURE_AMOUNT).as("totalAmount"),
+                        sum(
+                                DSL.when(dateFilter, EXPENDITURE.EXPENDITURE_AMOUNT).otherwise(BigDecimal.ZERO)
+                        ).as("totalAmount"),
                         EXPENDITURE_TYPE.EXPENDITURE_NAME.as("expenditureName")
                 )
                 .from(EXPENDITURE)
                 .leftJoin(EXPENDITURE_CATEGORY)
                 .on(EXPENDITURE.EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID))
                 .leftJoin(EXPENDITURE_TYPE).on(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID))
-                .where(EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate))
                 .groupBy(
                         EXPENDITURE_TYPE.EXPENDITURE_NAME
                 ).fetch();
@@ -100,8 +105,9 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             }
         }
         List<Double> expenditureList = new ArrayList<>();
-        expenditureList.add(0,totalExpense);
-        expenditureList.add(1,totalIncome);
+        expenditureList.add(0, totalExpense);
+        expenditureList.add(1, totalIncome);
+        System.out.println(expenditureList);
         return expenditureList;
     }
 
@@ -174,5 +180,29 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                         condition
                 )
                 .fetchInto(ExpenditureItem.class);
+    }
+
+    @Override
+    public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate, LocalDate endDate) {
+
+
+        return context.select(
+                EXPENDITURE_CATEGORY.CATEGORY_NAME,
+                sum(EXPENDITURE.EXPENDITURE_AMOUNT)
+        ).from(
+                EXPENDITURE
+        ).leftJoin(
+                EXPENDITURE_CATEGORY
+        ).on(
+                EXPENDITURE.EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID)
+        ).join(
+                EXPENDITURE_TYPE
+        ).on(
+                EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID).and(EXPENDITURE_TYPE.EXPENDITURE_NAME.eq("Expense"))
+        ).where(
+                EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate)
+        ).groupBy(
+                EXPENDITURE_CATEGORY.CATEGORY_NAME
+        ).fetchInto(CategoryWiseExpense.class);
     }
 }

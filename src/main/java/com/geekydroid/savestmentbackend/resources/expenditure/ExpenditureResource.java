@@ -1,11 +1,11 @@
 package com.geekydroid.savestmentbackend.resources.expenditure;
 
-import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureCategoryService;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureService;
-import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import com.geekydroid.savestmentbackend.utils.ResponseUtil;
+import com.geekydroid.savestmentbackend.utils.models.Error;
+import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -78,5 +78,14 @@ public class ExpenditureResource {
     ) {
 
         return expenditureService.getExpenditureItemBasedOnGivenFilters(request);
+    }
+
+    @GET
+    @Path("/categoryWise")
+    public Response getCategoryWiseExpense(@QueryParam("start_date") String startDate, @QueryParam("end_date") String endDate) {
+        if (startDate == null || endDate == null || startDate.isEmpty() || endDate.isEmpty()) {
+            return ResponseUtil.getResponseFromResult(new Error(Response.Status.BAD_REQUEST, new BadRequestException("Start date and End date should not be empty!"), null));
+        }
+        return ResponseUtil.getResponseFromResult(expenditureService.getCategoryWiseExpenseByGivenDateRange(startDate,endDate));
     }
 }

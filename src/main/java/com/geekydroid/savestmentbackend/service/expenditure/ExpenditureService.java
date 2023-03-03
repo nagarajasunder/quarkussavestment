@@ -7,6 +7,7 @@ import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.util.List;
 
 @ApplicationScoped
@@ -29,4 +30,6 @@ public interface ExpenditureService {
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
             ExpenditureFilterRequest request
     );
+
+    NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate);
 }

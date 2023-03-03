@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -111,6 +110,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
         List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startLocalDate, endLocalDate);
         List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate);
+        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(startLocalDate,endLocalDate);
 
         Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
 
@@ -118,6 +118,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 totalExpenditure,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
+                categoryWiseExpenses,
                 expenditureItems
 
         );
@@ -189,5 +190,22 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 endLocalDate,
                 request.getCategories()
         );
+    }
+
+    @Override
+    public NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate) {
+        LocalDate startLocalDate = null;
+        LocalDate endLocalDate = null;
+        if (startDate != null && !startDate.isEmpty()) {
+            startLocalDate = DateUtils.fromStringToLocalDate(startDate);
+        }
+
+        if (endDate != null && !endDate.isEmpty()) {
+            endLocalDate = DateUtils.fromStringToLocalDate(endDate);
+        }
+
+        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(startLocalDate,endLocalDate);
+
+        return new Success(Response.Status.OK,null,categoryWiseExpenses);
     }
 }

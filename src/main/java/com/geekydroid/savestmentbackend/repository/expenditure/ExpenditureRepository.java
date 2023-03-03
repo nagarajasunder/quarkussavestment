@@ -1,6 +1,7 @@
 package com.geekydroid.savestmentbackend.repository.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
+import com.geekydroid.savestmentbackend.domain.expenditure.CategoryWiseExpense;
 import com.geekydroid.savestmentbackend.domain.expenditure.Expenditure;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
 
@@ -32,4 +33,6 @@ public interface ExpenditureRepository {
             LocalDate toDate,
             List<String> expenditureCategories
     );
+
+    List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate,LocalDate endDate);
 }

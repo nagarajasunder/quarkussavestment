@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.domain.investment;
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ public class EquityItem {
 
     @JsonbProperty("trade_type")
 
-    private TradeType tradeType;
+    private String tradeType;
 
     @JsonbProperty("quantity")
     private Double quantity;
@@ -35,22 +36,22 @@ public class EquityItem {
     private UUID createdBy;
 
     @JsonbProperty("created_on")
-    private LocalDateTime createdOn;
+    private String createdOn;
 
     @JsonbProperty("updated_on")
-    private LocalDateTime updatedOn;
+    private String updatedOn;
 
     public EquityItem(
             String investmentType,
             String symbol,
             LocalDate tradeDate,
-            TradeType tradeType,
+            String tradeType,
             Double quantity,
             Double price,
             Double amountInvested,
             UUID createdBy,
-            LocalDateTime createdOn,
-            LocalDateTime updatedOn
+            String createdOn,
+            String updatedOn
     ) {
 
         this.investmentType = investmentType;
@@ -92,11 +93,11 @@ public class EquityItem {
         this.tradeDate = tradeDate;
     }
 
-    public TradeType getTradeType() {
+    public String getTradeType() {
         return tradeType;
     }
 
-    public void setTradeType(TradeType tradeType) {
+    public void setTradeType(String tradeType) {
         this.tradeType = tradeType;
     }
 
@@ -132,21 +133,33 @@ public class EquityItem {
         this.createdBy = createdBy;
     }
 
-    public LocalDateTime getCreatedOn() {
+    public String getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDateTime createdOn) {
+    public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
 
-    public LocalDateTime getUpdatedOn() {
+    public String getUpdatedOn() {
         return updatedOn;
     }
 
-    public void setUpdatedOn(LocalDateTime updatedOn) {
+    public void setUpdatedOn(String updatedOn) {
         this.updatedOn = updatedOn;
     }
 
-
+    @Override
+    public String toString() {
+        return "EquityItem{" +
+                "investmentType='" + investmentType + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", tradeDate=" + tradeDate +
+                ", tradeType=" + tradeType +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", amountInvested=" + amountInvested +
+                ", createdBy=" + createdBy +
+                '}';
+    }
 }

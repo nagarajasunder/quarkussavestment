@@ -4,9 +4,11 @@ import com.geekydroid.savestmentbackend.domain.investment.*;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentRepository;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
+import com.geekydroid.savestmentbackend.utils.Utils;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
+import jdk.jshell.execution.Util;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -34,13 +36,14 @@ public class InvestmentServiceImpl implements InvestmentService {
         List<InvestmentItem> investmentItems = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         for (EquityItem equityItem : equityItems) {
-            InvestmentType investmentType = investmentTypeRepository.findInvestmentTypeByName(equityItem.getInvestmentType());
+            String InvestmentType = Utils.convertInvestmentTypeString(equityItem.getInvestmentType());
+            InvestmentType investmentType = investmentTypeRepository.findInvestmentTypeByName(InvestmentType);
             if (investmentType != null) {
                 InvestmentItem investmentItem = new InvestmentItem(
                         investmentType,
                         equityItem.getSymbol(),
                         equityItem.getTradeDate(),
-                        equityItem.getTradeType(),
+                        Utils.convertStringToTradeType(equityItem.getTradeType()),
                         equityItem.getQuantity(),
                         equityItem.getPrice(),
                         equityItem.getAmountInvested(),
@@ -51,7 +54,9 @@ public class InvestmentServiceImpl implements InvestmentService {
                 investmentItems.add(investmentItem);
             }
         }
+        System.out.println("Investment Items size "+investmentItems.size());
         if (investmentItems.size() > 0) {
+            System.out.println("INvestment Items "+investmentItems);
             List<InvestmentItem> investmentItemList = investmentRepository.addEquity(investmentItems);
             if (investmentItemList != null && investmentItemList.size() > 0) {
                 return new Success(Response.Status.CREATED, null, investmentItemList);
@@ -69,12 +74,11 @@ public class InvestmentServiceImpl implements InvestmentService {
             errorResp.setMessage("Equity number should not be empty");
             errorResp.setStatus("FAILED");
             return new Error(Response.Status.BAD_REQUEST, null, errorResp);
-        }
-        else {
+        } else {
             InvestmentItem item = investmentRepository.findInvestmentItemById(EquityNumber);
             if (item == null) {
                 errorResp.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
-                errorResp.setMessage("Equity with number "+EquityNumber+" doesn't exist.");
+                errorResp.setMessage("Equity with number " + EquityNumber + " doesn't exist.");
                 errorResp.setStatus("FAILED");
                 return new Error(Response.Status.BAD_REQUEST, null, errorResp);
             }
@@ -106,12 +110,13 @@ public class InvestmentServiceImpl implements InvestmentService {
         LocalDate localStartDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate localEndDate = DateUtils.fromStringToLocalDate(endDate);
 
-        List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate,localEndDate);
-        List<EquityItem> recentEquityData =  investmentRepository.getEquityItemsGivenDateRange(localStartDate,localEndDate);
+        List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate, localEndDate);
+        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsGivenDateRange(localStartDate, localEndDate);
+        System.out.println(recentEquityData);
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
-        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(),overviews,recentEquityData);
-        return new Success(Response.Status.OK,null,investmentOverview);
+        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews, recentEquityData);
+        return new Success(Response.Status.OK, null, investmentOverview);
 
     }
 
