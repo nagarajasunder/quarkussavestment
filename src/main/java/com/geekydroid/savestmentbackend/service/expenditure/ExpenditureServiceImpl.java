@@ -130,7 +130,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
-        return repository.getExpenditureByGivenDateRange(startLocalDate, endLocalDate);
+        return repository.getExpenditureItemBasedOnGivenFilters(null,null,startLocalDate, endLocalDate,null);
     }
 
     @Override

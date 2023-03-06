@@ -1,9 +1,6 @@
 package com.geekydroid.savestmentbackend.repository.investment;
 
-import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentTypeOverview;
+import com.geekydroid.savestmentbackend.domain.investment.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,5 +19,9 @@ public interface InvestmentRepository {
 
     List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate);
 
-    List<EquityItem> getEquityItemsGivenDateRange(LocalDate localStartDate, LocalDate localEndDate);
+    List<EquityItem> getEquityItemsBasedOnGivenFilters(
+            LocalDate fromDate,
+            LocalDate toDate,
+            List<String> investmentCategories
+    );
 }

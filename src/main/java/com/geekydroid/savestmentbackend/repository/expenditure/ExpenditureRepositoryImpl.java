@@ -111,29 +111,6 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         return expenditureList;
     }
 
-    @Override
-    public List<ExpenditureItem> getExpenditureByGivenDateRange(LocalDate startDate, LocalDate endDate) {
-
-
-        List<ExpenditureItem> result = context.select(
-                        EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
-                        EXPENDITURE.DATE_OF_EXPENDITURE.as("expenditureDate"),
-                        EXPENDITURE.EXPENDITURE_DESCRIPTION.as("expenditureDescription"),
-                        EXPENDITURE_CATEGORY.CATEGORY_NAME.as("expenditureCategory"),
-                        EXPENDITURE_TYPE.EXPENDITURE_NAME.as("expenditureType"),
-                        EXPENDITURE.EXPENDITURE_AMOUNT.as("expenditureAmount"),
-                        EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).as("paymode")
-                ).from(EXPENDITURE)
-                .leftJoin(EXPENDITURE_CATEGORY)
-                .on(
-                        EXPENDITURE.EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID)
-                ).leftJoin(
-                        EXPENDITURE_TYPE
-                ).on(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID))
-                .where(EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate))
-                .fetchInto(ExpenditureItem.class);
-        return result;
-    }
 
     @Override
     public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
@@ -144,24 +121,8 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             List<String> expenditureCategories
     ) {
 
-        Condition condition = noCondition();
 
-        if (expenditureType != null && !expenditureType.isEmpty()) {
-            condition = condition.and(EXPENDITURE_TYPE.EXPENDITURE_NAME.equalIgnoreCase(expenditureType));
-        }
-        if (fromDate != null) {
-            condition = condition.and(EXPENDITURE.DATE_OF_EXPENDITURE.greaterOrEqual(fromDate));
-        }
-        if (toDate != null) {
-            condition = condition.and(EXPENDITURE.DATE_OF_EXPENDITURE.lessOrEqual(toDate));
-        }
-        if (paymode != null && !paymode.isEmpty()) {
-            condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
-        }
-
-        if (expenditureCategories != null && expenditureCategories.size() > 0) {
-            condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
-        }
+        Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, expenditureCategories);
 
         return context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
@@ -180,6 +141,29 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                         condition
                 )
                 .fetchInto(ExpenditureItem.class);
+    }
+
+    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, List<String> expenditureCategories) {
+        Condition condition = noCondition();
+
+        if (expenditureType != null && !expenditureType.isEmpty()) {
+            condition = condition.and(EXPENDITURE_TYPE.EXPENDITURE_NAME.equalIgnoreCase(expenditureType));
+        }
+        if (fromDate != null) {
+            condition = condition.and(EXPENDITURE.DATE_OF_EXPENDITURE.greaterOrEqual(fromDate));
+        }
+        if (toDate != null) {
+
+            condition = condition.and(EXPENDITURE.DATE_OF_EXPENDITURE.lessOrEqual(toDate));
+        }
+        if (paymode != null && !paymode.isEmpty()) {
+            condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
+        }
+
+        if (expenditureCategories != null && expenditureCategories.size() > 0) {
+            condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
+        }
+        return condition;
     }
 
     @Override

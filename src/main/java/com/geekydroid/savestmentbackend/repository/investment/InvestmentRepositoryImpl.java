@@ -2,10 +2,7 @@ package com.geekydroid.savestmentbackend.repository.investment;
 
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
-import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentTypeOverview;
+import com.geekydroid.savestmentbackend.domain.investment.*;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.SQLDataType;
@@ -21,8 +18,7 @@ import java.util.List;
 
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_ITEMS;
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_TYPES;
-import static org.jooq.impl.DSL.sum;
-import static org.jooq.impl.DSL.when;
+import static org.jooq.impl.DSL.*;
 
 @ApplicationScoped
 @Transactional
@@ -104,8 +100,14 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
         return result;
     }
 
+
     @Override
-    public List<EquityItem> getEquityItemsGivenDateRange(LocalDate localStartDate, LocalDate localEndDate) {
+    public List<EquityItem> getEquityItemsBasedOnGivenFilters(
+            LocalDate fromDate,
+            LocalDate toDate,
+            List<String> investmentCategories
+    ) {
+        Condition condition = chainFilters(fromDate,toDate,investmentCategories);
 
         return context.select(
                         INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_type"),
@@ -122,11 +124,32 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 .from(INVESTMENT_ITEMS)
                 .leftJoin(INVESTMENT_TYPES)
                 .on(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID.eq(INVESTMENT_TYPES.INVESTMENT_TYPE_ID))
-                .where(INVESTMENT_ITEMS.TRADE_DATE.between(localStartDate, localEndDate))
+                .where(condition)
                 .fetchInto(EquityItem.class);
+    }
 
+    private Condition chainFilters(
+            LocalDate fromDate,
+            LocalDate toDate,
+            List<String> investmentCategories
+    ) {
+        Condition condition = noCondition();
+
+        if (fromDate != null) {
+            condition = condition.and(INVESTMENT_ITEMS.TRADE_DATE.greaterOrEqual(fromDate));
+        }
+        if (toDate != null) {
+            condition = condition.and(INVESTMENT_ITEMS.TRADE_DATE.lessOrEqual(toDate));
+        }
+        if (investmentCategories != null && !investmentCategories.isEmpty()) {
+            condition = condition.and(INVESTMENT_TYPES.INVESTMENT_NAME.in(investmentCategories));
+        }
+
+        return condition;
 
     }
+
+
 
 
 }

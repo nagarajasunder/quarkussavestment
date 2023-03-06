@@ -8,7 +8,6 @@ import com.geekydroid.savestmentbackend.utils.Utils;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
-import jdk.jshell.execution.Util;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -111,7 +110,7 @@ public class InvestmentServiceImpl implements InvestmentService {
         LocalDate localEndDate = DateUtils.fromStringToLocalDate(endDate);
 
         List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate, localEndDate);
-        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsGivenDateRange(localStartDate, localEndDate);
+        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsBasedOnGivenFilters(localStartDate, localEndDate,null);
         System.out.println(recentEquityData);
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));

@@ -24,8 +24,6 @@ public interface ExpenditureRepository {
 
     List<Double> getTotalExpenseAndIncomeAmount(LocalDate startDate, LocalDate endDate);
 
-    List<ExpenditureItem> getExpenditureByGivenDateRange(LocalDate startDate, LocalDate endDate);
-
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
             String expenditureType,
             List<Paymode> paymodes,
