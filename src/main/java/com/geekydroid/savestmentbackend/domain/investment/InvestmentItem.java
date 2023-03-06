@@ -47,7 +47,7 @@ public class InvestmentItem extends PanacheEntityBase {
     private LocalDate tradeDate;
 
     @Column(name = "TRADE_TYPE")
-    private TradeType tradeType;
+    private String tradeType;
 
     @Column(name = "UNITS")
     private Double units;
@@ -68,7 +68,7 @@ public class InvestmentItem extends PanacheEntityBase {
     @Column(name = "UPDATED_ON")
     private LocalDateTime updatedOn;
 
-    public InvestmentItem(InvestmentType investmentType, String symbol, LocalDate tradeDate, TradeType tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
+    public InvestmentItem(InvestmentType investmentType, String symbol, LocalDate tradeDate, String tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.investmentType = investmentType;
         this.symbol = symbol;
         this.tradeDate = tradeDate;
@@ -108,11 +108,19 @@ public class InvestmentItem extends PanacheEntityBase {
         this.tradeDate = tradeDate;
     }
 
-    public TradeType getTradeType() {
+    public InvestmentType getInvestmentType() {
+        return investmentType;
+    }
+
+    public void setInvestmentType(InvestmentType investmentType) {
+        this.investmentType = investmentType;
+    }
+
+    public String getTradeType() {
         return tradeType;
     }
 
-    public void setTradeType(TradeType tradeType) {
+    public void setTradeType(String tradeType) {
         this.tradeType = tradeType;
     }
 

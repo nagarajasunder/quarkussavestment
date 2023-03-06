@@ -43,7 +43,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                         investmentType,
                         equityItem.getSymbol(),
                         equityItem.getTradeDate(),
-                        Utils.convertStringToTradeType(equityItem.getTradeType()),
+                        equityItem.getTradeType().toUpperCase(),
                         equityItem.getQuantity(),
                         equityItem.getPrice(),
                         equityItem.getAmountInvested(),
@@ -54,9 +54,9 @@ public class InvestmentServiceImpl implements InvestmentService {
                 investmentItems.add(investmentItem);
             }
         }
-        System.out.println("Investment Items size "+investmentItems.size());
+        System.out.println("Investment Items size " + investmentItems.size());
         if (investmentItems.size() > 0) {
-            System.out.println("INvestment Items "+investmentItems);
+            System.out.println("INvestment Items " + investmentItems);
             List<InvestmentItem> investmentItemList = investmentRepository.addEquity(investmentItems);
             if (investmentItemList != null && investmentItemList.size() > 0) {
                 return new Success(Response.Status.CREATED, null, investmentItemList);

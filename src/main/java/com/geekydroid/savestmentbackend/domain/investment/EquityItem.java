@@ -20,7 +20,6 @@ public class EquityItem {
     private LocalDate tradeDate;
 
     @JsonbProperty("trade_type")
-
     private String tradeType;
 
     @JsonbProperty("quantity")

@@ -6,11 +6,8 @@ import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentTypeOverview;
-import com.geekydroid.savestmentbackend.utils.Utils;
-import com.geekydroid.savestmentbackend.utils.converters.TradeTypeConverter;
-import org.graalvm.collections.Pair;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
 import org.jooq.impl.SQLDataType;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -20,11 +17,12 @@ import javax.ws.rs.NotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_ITEMS;
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_TYPES;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.sum;
+import static org.jooq.impl.DSL.when;
 
 @ApplicationScoped
 @Transactional
@@ -52,7 +50,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
         entity.setPrice(equityItem.getPrice());
         entity.setAmountInvested(equityItem.getAmountInvested());
         entity.setUpdatedOn(now);
-        entity.setTradeType(Utils.convertStringToTradeType(equityItem.getTradeType()));
+        entity.setTradeType(equityItem.getTradeType());
         entity.setTradeDate(equityItem.getTradeDate());
         return entity;
 
@@ -80,25 +78,25 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
     @Override
     public List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate) {
 
-        Condition dateFilter = INVESTMENT_ITEMS.TRADE_DATE.between(startDate,endDate);
+        Condition dateFilter = INVESTMENT_ITEMS.TRADE_DATE.between(startDate, endDate);
 
         List<InvestmentTypeOverview> result = context
                 .select(
                         INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_name"),
-                       sum(
-                               when(
-                                       dateFilter.and(INVESTMENT_ITEMS.TRADE_TYPE.convert(TradeTypeConverter.getConverter()).eq(TradeType.BUY)),
-                                       INVESTMENT_ITEMS.AMOUNT_INVESTED
-                               ).otherwise(BigDecimal.ZERO)
-                       ).as("totalBuySum"),
+                        sum(
+                                when(
+                                        dateFilter.and(INVESTMENT_ITEMS.TRADE_TYPE.eq(TradeType.BUY.name())),
+                                        INVESTMENT_ITEMS.AMOUNT_INVESTED
+                                ).otherwise(BigDecimal.ZERO)
+                        ).as("total_buy_value"),
                         sum(
                                 when(dateFilter
-                                                .and(INVESTMENT_ITEMS.TRADE_TYPE.convert(TradeTypeConverter.getConverter()).eq(TradeType.SELL)),
+                                                .and(INVESTMENT_ITEMS.TRADE_TYPE.eq(TradeType.SELL.name())),
                                         INVESTMENT_ITEMS.AMOUNT_INVESTED).otherwise(BigDecimal.ZERO)
-                        ).as("totalSellSum")
+                        ).as("total_sell_value")
                 )
-                .from(INVESTMENT_ITEMS)
-                .leftJoin(INVESTMENT_TYPES)
+                .from(INVESTMENT_TYPES)
+                .leftJoin(INVESTMENT_ITEMS)
                 .on(INVESTMENT_TYPES.INVESTMENT_TYPE_ID.eq(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID))
                 .groupBy(INVESTMENT_TYPES.INVESTMENT_NAME)
                 .fetchInto(InvestmentTypeOverview.class);
@@ -110,21 +108,21 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
     public List<EquityItem> getEquityItemsGivenDateRange(LocalDate localStartDate, LocalDate localEndDate) {
 
         return context.select(
-                INVESTMENT_TYPES.INVESTMENT_NAME,
-                INVESTMENT_ITEMS.SYMBOL,
-                INVESTMENT_ITEMS.TRADE_DATE,
-                INVESTMENT_ITEMS.TRADE_TYPE.cast(SQLDataType.VARCHAR),
-                INVESTMENT_ITEMS.UNITS,
-                INVESTMENT_ITEMS.PRICE,
-                INVESTMENT_ITEMS.AMOUNT_INVESTED,
-                INVESTMENT_ITEMS.CREATED_BY,
-                INVESTMENT_ITEMS.CREATED_ON.cast(SQLDataType.VARCHAR),
-                INVESTMENT_ITEMS.UPDATED_ON.cast(SQLDataType.VARCHAR)
+                        INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_type"),
+                        INVESTMENT_ITEMS.SYMBOL.as("symbol"),
+                        INVESTMENT_ITEMS.TRADE_DATE.as("trade_date"),
+                        INVESTMENT_ITEMS.TRADE_TYPE.as("trade_type"),
+                        INVESTMENT_ITEMS.UNITS.as("quantity"),
+                        INVESTMENT_ITEMS.PRICE,
+                        INVESTMENT_ITEMS.AMOUNT_INVESTED,
+                        INVESTMENT_ITEMS.CREATED_BY,
+                        INVESTMENT_ITEMS.CREATED_ON.cast(SQLDataType.VARCHAR),
+                        INVESTMENT_ITEMS.UPDATED_ON.cast(SQLDataType.VARCHAR)
                 )
                 .from(INVESTMENT_ITEMS)
                 .leftJoin(INVESTMENT_TYPES)
                 .on(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID.eq(INVESTMENT_TYPES.INVESTMENT_TYPE_ID))
-                .where(INVESTMENT_ITEMS.TRADE_DATE.between(localStartDate,localEndDate))
+                .where(INVESTMENT_ITEMS.TRADE_DATE.between(localStartDate, localEndDate))
                 .fetchInto(EquityItem.class);
 
 
