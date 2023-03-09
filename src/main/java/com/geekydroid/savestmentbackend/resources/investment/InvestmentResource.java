@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.resources.investment;
 
 
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
+import com.geekydroid.savestmentbackend.domain.investment.InvestmentFilterRequest;
 import com.geekydroid.savestmentbackend.service.investment.InvestmentService;
 import com.geekydroid.savestmentbackend.utils.ResponseUtil;
 
@@ -24,7 +25,7 @@ public class InvestmentResource {
     @Path("/addEquity")
     @Transactional
     public Response addEquity(List<EquityItem> equityItems) {
-        System.out.println("Resource "+equityItems);
+        System.out.println("Resource " + equityItems);
         return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems));
     }
 
@@ -32,7 +33,7 @@ public class InvestmentResource {
     @Path("/updateEquity/{equityNumber}")
     @Transactional
     public Response updateEquity(@PathParam("equityNumber") String equityNumber, EquityItem equityItem) {
-        return ResponseUtil.getResponseFromResult(investmentService.updateEquityItems(equityNumber,equityItem));
+        return ResponseUtil.getResponseFromResult(investmentService.updateEquityItems(equityNumber, equityItem));
     }
 
     @DELETE()
@@ -44,8 +45,16 @@ public class InvestmentResource {
 
     @GET()
     @Path("/overview")
-    public Response getInvestmentOverview(@QueryParam("startDate") String startDate,@QueryParam("endDate") String endDate) {
-        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate,endDate));
+    public Response getInvestmentOverview(@QueryParam("startDate") String startDate, @QueryParam("endDate") String endDate) {
+        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate, endDate));
+    }
+
+    @POST()
+    @Path("/filterBy")
+    public Response getExpenditureBasedOnFilters(
+            InvestmentFilterRequest request
+    ) {
+        return ResponseUtil.getResponseFromResult(investmentService.getExpenditureItemBasedOnGivenFilters(request));
     }
 
 }

@@ -78,38 +78,40 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
 
         List<InvestmentTypeOverview> result = context
                 .select(
-                        INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_name"),
+                        INVESTMENT_TYPES.INVESTMENT_NAME,
                         sum(
                                 when(
                                         dateFilter.and(INVESTMENT_ITEMS.TRADE_TYPE.eq(TradeType.BUY.name())),
                                         INVESTMENT_ITEMS.AMOUNT_INVESTED
                                 ).otherwise(BigDecimal.ZERO)
-                        ).as("total_buy_value"),
+                        ),
                         sum(
                                 when(dateFilter
                                                 .and(INVESTMENT_ITEMS.TRADE_TYPE.eq(TradeType.SELL.name())),
                                         INVESTMENT_ITEMS.AMOUNT_INVESTED).otherwise(BigDecimal.ZERO)
-                        ).as("total_sell_value")
+                        )
                 )
                 .from(INVESTMENT_TYPES)
                 .leftJoin(INVESTMENT_ITEMS)
                 .on(INVESTMENT_TYPES.INVESTMENT_TYPE_ID.eq(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID))
                 .groupBy(INVESTMENT_TYPES.INVESTMENT_NAME)
                 .fetchInto(InvestmentTypeOverview.class);
-
         return result;
     }
 
 
     @Override
     public List<EquityItem> getEquityItemsBasedOnGivenFilters(
+            String equityId,
             LocalDate fromDate,
             LocalDate toDate,
-            List<String> investmentCategories
+            List<String> investmentCategories,
+            String tradeType
     ) {
-        Condition condition = chainFilters(fromDate,toDate,investmentCategories);
+        Condition condition = chainFilters(equityId, fromDate, toDate, investmentCategories, tradeType);
 
         return context.select(
+                        INVESTMENT_ITEMS.INVESTMENT_ID.as("investment_number"),
                         INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_type"),
                         INVESTMENT_ITEMS.SYMBOL.as("symbol"),
                         INVESTMENT_ITEMS.TRADE_DATE.as("trade_date"),
@@ -128,12 +130,20 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 .fetchInto(EquityItem.class);
     }
 
+
     private Condition chainFilters(
+            String equityId,
             LocalDate fromDate,
             LocalDate toDate,
-            List<String> investmentCategories
+            List<String> investmentCategories,
+            String tradeType
     ) {
         Condition condition = noCondition();
+
+        if (equityId != null && !equityId.isEmpty()) {
+            condition = condition.and(INVESTMENT_ITEMS.INVESTMENT_ID.eq(equityId));
+            return condition;
+        }
 
         if (fromDate != null) {
             condition = condition.and(INVESTMENT_ITEMS.TRADE_DATE.greaterOrEqual(fromDate));
@@ -144,12 +154,13 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
         if (investmentCategories != null && !investmentCategories.isEmpty()) {
             condition = condition.and(INVESTMENT_TYPES.INVESTMENT_NAME.in(investmentCategories));
         }
+        if (tradeType != null && !tradeType.isEmpty()) {
+            condition = condition.and(INVESTMENT_ITEMS.TRADE_TYPE.eq(tradeType));
+        }
 
         return condition;
 
     }
-
-
 
 
 }

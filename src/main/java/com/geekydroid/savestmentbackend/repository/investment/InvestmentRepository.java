@@ -20,8 +20,10 @@ public interface InvestmentRepository {
     List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate);
 
     List<EquityItem> getEquityItemsBasedOnGivenFilters(
+            String equityId,
             LocalDate fromDate,
             LocalDate toDate,
-            List<String> investmentCategories
+            List<String> investmentCategories,
+            String tradeType
     );
 }

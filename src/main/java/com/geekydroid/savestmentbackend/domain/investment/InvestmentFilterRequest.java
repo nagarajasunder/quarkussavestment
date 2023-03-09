@@ -14,11 +14,14 @@ import java.util.List;
 @Setter
 public class InvestmentFilterRequest {
 
+    private String equityId;
     private String fromDate;
 
     private String toDate;
 
     private List<String> investmentCategories;
+
+    private String tradeType;
 
 
 }

@@ -1,5 +1,17 @@
 package com.geekydroid.savestmentbackend.utils.models;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GenericNetworkResponse {
 
     private int statusCode;
@@ -9,45 +21,4 @@ public class GenericNetworkResponse {
 
     private Object body;
 
-    public GenericNetworkResponse() {
-    }
-
-    public GenericNetworkResponse(int statusCode, String status, String message, Object body) {
-        this.statusCode = statusCode;
-        this.status = status;
-        this.message = message;
-        this.body = body;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getBody() {
-        return body;
-    }
-
-    public void setBody(Object body) {
-        this.body = body;
-    }
 }

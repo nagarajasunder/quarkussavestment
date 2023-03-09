@@ -26,8 +26,6 @@ public class ResponseUtil {
                     .entity(message)
                     .build();
         }
-
-
         return Response.status(result.statusCode)
                 .entity(result.body)
                 .build();

@@ -4,7 +4,6 @@ import com.geekydroid.savestmentbackend.domain.investment.*;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentRepository;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
-import com.geekydroid.savestmentbackend.utils.Utils;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
@@ -12,6 +11,7 @@ import com.geekydroid.savestmentbackend.utils.models.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
@@ -35,8 +35,7 @@ public class InvestmentServiceImpl implements InvestmentService {
         List<InvestmentItem> investmentItems = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         for (EquityItem equityItem : equityItems) {
-            String InvestmentType = Utils.convertInvestmentTypeString(equityItem.getInvestmentType());
-            InvestmentType investmentType = investmentTypeRepository.findInvestmentTypeByName(InvestmentType);
+            InvestmentType investmentType = investmentTypeRepository.findInvestmentTypeByName(equityItem.getInvestmentType());
             if (investmentType != null) {
                 InvestmentItem investmentItem = new InvestmentItem(
                         investmentType,
@@ -58,7 +57,13 @@ public class InvestmentServiceImpl implements InvestmentService {
             System.out.println("INvestment Items " + investmentItems);
             List<InvestmentItem> investmentItemList = investmentRepository.addEquity(investmentItems);
             if (investmentItemList != null && investmentItemList.size() > 0) {
-                return new Success(Response.Status.CREATED, null, investmentItemList);
+                return new Success(Response.Status.CREATED, null, new GenericNetworkResponse(
+                        Response.Status.CREATED.getStatusCode(),
+                        "success",
+                        "Equity Item created successfully",
+                        null
+
+                ));
             }
         }
         return new Error(Response.Status.INTERNAL_SERVER_ERROR, null, null);
@@ -90,7 +95,12 @@ public class InvestmentServiceImpl implements InvestmentService {
         if (item == null) {
             return new Error(Response.Status.INTERNAL_SERVER_ERROR, null, null);
         }
-        return new Success(Response.Status.OK, null, item);
+        return new Success(Response.Status.OK, null, new GenericNetworkResponse(
+                Response.Status.OK.getStatusCode(),
+                "success",
+                "Equity Item updated successfully",
+                null
+        ));
     }
 
 
@@ -110,14 +120,24 @@ public class InvestmentServiceImpl implements InvestmentService {
         LocalDate localEndDate = DateUtils.fromStringToLocalDate(endDate);
 
         List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate, localEndDate);
-        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsBasedOnGivenFilters(localStartDate, localEndDate,null);
-        System.out.println(recentEquityData);
+        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsBasedOnGivenFilters(null, localStartDate, localEndDate, null, null);
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
         InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews, recentEquityData);
+        System.out.println("getInvestmentOverview " + investmentOverview);
         return new Success(Response.Status.OK, null, investmentOverview);
 
     }
 
+    @Override
+    public NetworkResponse getExpenditureItemBasedOnGivenFilters(InvestmentFilterRequest filterRequest) {
+        if (filterRequest == null) {
+            return new Error(Response.Status.BAD_REQUEST, new BadRequestException("Investment Filter request is empty"), null);
+        }
+        LocalDate localStartDate = filterRequest.getFromDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getFromDate()) : null;
+        LocalDate localEndDate = filterRequest.getToDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getToDate()) : null;
+        List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType());
+        return new Success(Response.Status.OK, null, results);
+    }
 
 }
