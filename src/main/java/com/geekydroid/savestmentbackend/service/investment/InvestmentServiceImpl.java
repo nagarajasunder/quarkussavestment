@@ -4,9 +4,11 @@ import com.geekydroid.savestmentbackend.domain.investment.*;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentRepository;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
+import com.geekydroid.savestmentbackend.utils.InvestmentExcelGenerator;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -14,6 +16,8 @@ import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -138,6 +142,25 @@ public class InvestmentServiceImpl implements InvestmentService {
         LocalDate localEndDate = filterRequest.getToDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getToDate()) : null;
         List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType());
         return new Success(Response.Status.OK, null, results);
+    }
+
+    @Override
+    public File exportDataToExcel(InvestmentFilterRequest filterRequest) {
+        LocalDate localStartDate = filterRequest.getFromDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getFromDate()) : null;
+        LocalDate localEndDate = filterRequest.getToDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getToDate()) : null;
+        List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType());
+        List<String> investmentTypes = investmentTypeRepository.getAllInvestmentCategories();
+        return createExcel(investmentTypes,results);
+    }
+
+    private File createExcel(List<String> investmentTypes,List<EquityItem> results) {
+       try {
+           InvestmentExcelGenerator generator = new InvestmentExcelGenerator();
+           return generator.createExcel(investmentTypes,results);
+       }
+       catch (IOException ignored) {
+           return null;
+       }
     }
 
 }

@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -55,6 +56,20 @@ public class InvestmentResource {
             InvestmentFilterRequest request
     ) {
         return ResponseUtil.getResponseFromResult(investmentService.getExpenditureItemBasedOnGivenFilters(request));
+    }
+
+    @POST
+    @Path("/exportData")
+    public Response exportInvestmentData(
+            InvestmentFilterRequest request
+    ) {
+        File file = investmentService.exportDataToExcel(request);
+        if (file == null) {
+            return Response.serverError().build();
+        }
+        Response.ResponseBuilder responseBuilder = Response.ok(file);
+        responseBuilder.header("Content-Disposition","attachment; filename="+file.getName());
+        return responseBuilder.build();
     }
 
 }

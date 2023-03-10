@@ -97,6 +97,12 @@
       <version>1.18.26</version>
       <scope>provided</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.2.3</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
