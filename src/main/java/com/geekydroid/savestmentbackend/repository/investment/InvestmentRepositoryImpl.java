@@ -154,7 +154,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
         if (investmentCategories != null && !investmentCategories.isEmpty()) {
             condition = condition.and(INVESTMENT_TYPES.INVESTMENT_NAME.in(investmentCategories));
         }
-        if (tradeType != null && !tradeType.isEmpty()) {
+        if (tradeType != null && !tradeType.isEmpty() && !tradeType.equalsIgnoreCase(TradeType.UNSPECIFIED.name())) {
             condition = condition.and(INVESTMENT_ITEMS.TRADE_TYPE.eq(tradeType));
         }
 

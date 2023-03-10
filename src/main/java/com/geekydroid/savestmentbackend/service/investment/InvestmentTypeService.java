@@ -9,4 +9,6 @@ public interface InvestmentTypeService {
     InvestmentType findInvestmentTypeByName(String investmentTypeName);
 
     List<InvestmentType> getAllInvestmentTypes();
+
+    List<String> getAllInvestmentCategories();
 }

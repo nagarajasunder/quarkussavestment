@@ -76,7 +76,6 @@ public class ExpenditureResource {
     public List<ExpenditureItem> getExpenditureBasedOnFilters(
             ExpenditureFilterRequest request
     ) {
-
         return expenditureService.getExpenditureItemBasedOnGivenFilters(request);
     }
 

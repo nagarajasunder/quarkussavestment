@@ -25,4 +25,9 @@ public class InvestmentTypeServiceImpl implements InvestmentTypeService{
     public List<InvestmentType> getAllInvestmentTypes() {
         return repository.getAllInvestmentTypes();
     }
+
+    @Override
+    public List<String> getAllInvestmentCategories() {
+        return repository.getAllInvestmentCategories();
+    }
 }

@@ -10,4 +10,5 @@ public interface InvestmentTypeRepository {
 
     List<InvestmentType> getAllInvestmentTypes();
 
+    List<String> getAllInvestmentCategories();
 }
