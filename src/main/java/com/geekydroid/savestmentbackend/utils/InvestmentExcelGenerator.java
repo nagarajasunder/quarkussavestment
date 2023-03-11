@@ -32,12 +32,14 @@ public class InvestmentExcelGenerator {
         Map<String, List<EquityItem>> equityItemMap = groupInvestmentsByTypes(investmentTypes, equityItems);
         List<String> sheetHeaders = List.of("S.No","Symbol","Trade Date","Trade Type","Units","Price","Amount Invested");
         for (Map.Entry<String, List<EquityItem>> entry : equityItemMap.entrySet()) {
-            serialNumber = 1;
-            HSSFSheet sheet = workbook.createSheet(entry.getKey());
-            createSheetHeader(sheet,sheetHeaders);
             List<EquityItem> groupedEquityItems = entry.getValue();
-            for (int i = 0;i<groupedEquityItems.size();i++) {
-                addDataInRow(i+1,sheet,groupedEquityItems.get(i));
+            if (!groupedEquityItems.isEmpty()) {
+                serialNumber = 1;
+                HSSFSheet sheet = workbook.createSheet(entry.getKey());
+                createSheetHeader(sheet,sheetHeaders);
+                for (int i = 0;i<groupedEquityItems.size();i++) {
+                    addDataInRow(i+1,sheet,groupedEquityItems.get(i));
+                }
             }
         }
         return workbook;

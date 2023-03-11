@@ -4,6 +4,7 @@ import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
+import com.geekydroid.savestmentbackend.utils.ExpenditureExcelGenerator;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
@@ -14,6 +15,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -207,5 +210,37 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(startLocalDate,endLocalDate);
 
         return new Success(Response.Status.OK,null,categoryWiseExpenses);
+    }
+
+    @Override
+    public File exportDataToExcel(ExpenditureFilterRequest request) throws IOException {
+
+        LocalDate startLocalDate = null;
+        LocalDate endLocalDate = null;
+        if (request.getFromDate() != null && !request.getFromDate().isEmpty()) {
+            startLocalDate = DateUtils.fromStringToLocalDate(request.getFromDate());
+        }
+
+        if (request.getToDate() != null && !request.getToDate().isEmpty()) {
+            endLocalDate = DateUtils.fromStringToLocalDate(request.getToDate());
+        }
+
+        List<Paymode> paymodes = new ArrayList<>();
+        if (request.getPaymodes() != null && request.getPaymodes().size() > 0) {
+            paymodes = request.getPaymodes().stream().map(paymode -> Paymode.valueOf(paymode.toUpperCase())).toList();
+        }
+
+
+        List<ExpenditureItem> expenditureItems =  repository.getExpenditureItemBasedOnGivenFilters(
+                request.getExpenditureType(),
+                paymodes,
+                startLocalDate,
+                endLocalDate,
+                request.getCategories()
+        );
+
+        ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();
+        return generator.createExcel(expenditureItems);
+
     }
 }

@@ -7,6 +7,8 @@ import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,4 +34,6 @@ public interface ExpenditureService {
     );
 
     NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate);
+
+    File exportDataToExcel(ExpenditureFilterRequest filterRequest) throws IOException;
 }

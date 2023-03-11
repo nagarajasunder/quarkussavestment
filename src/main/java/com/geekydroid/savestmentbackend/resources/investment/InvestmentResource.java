@@ -63,12 +63,17 @@ public class InvestmentResource {
     public Response exportInvestmentData(
             InvestmentFilterRequest request
     ) {
+        if (request == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Investment Filter request cannot be null").build();
+        }
+
         File file = investmentService.exportDataToExcel(request);
         if (file == null) {
             return Response.serverError().build();
         }
         Response.ResponseBuilder responseBuilder = Response.ok(file);
         responseBuilder.header("Content-Disposition","attachment; filename="+file.getName());
+        file.deleteOnExit();
         return responseBuilder.build();
     }
 

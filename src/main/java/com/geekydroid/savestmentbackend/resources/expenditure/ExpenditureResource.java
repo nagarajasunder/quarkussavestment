@@ -11,6 +11,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Path("/expenditure")
@@ -86,5 +88,25 @@ public class ExpenditureResource {
             return ResponseUtil.getResponseFromResult(new Error(Response.Status.BAD_REQUEST, new BadRequestException("Start date and End date should not be empty!"), null));
         }
         return ResponseUtil.getResponseFromResult(expenditureService.getCategoryWiseExpenseByGivenDateRange(startDate,endDate));
+    }
+
+    @POST()
+    @Path("/exportData")
+    public Response exportData(
+            ExpenditureFilterRequest request
+    ) throws IOException {
+        if (request == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Expenditure Request cannot be null").build();
+        }
+
+        File file = expenditureService.exportDataToExcel(request);
+        if (file == null)
+        {
+            return Response.serverError().build();
+        }
+        Response.ResponseBuilder builder = Response.ok(file);
+        builder.header("Content-Disposition","attachment; filename="+file.getName());
+        file.deleteOnExit();
+        return builder.build();
     }
 }
