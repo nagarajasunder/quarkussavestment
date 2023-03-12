@@ -29,7 +29,8 @@ public interface ExpenditureRepository {
             List<Paymode> paymodes,
             LocalDate fromDate,
             LocalDate toDate,
-            List<String> expenditureCategories
+            List<String> expenditureCategories,
+            int limit
     );
 
     List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate,LocalDate endDate);

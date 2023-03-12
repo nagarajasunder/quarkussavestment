@@ -112,7 +112,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
         List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startLocalDate, endLocalDate);
-        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate);
+        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate,5);
         List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(startLocalDate,endLocalDate);
 
         Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
@@ -128,12 +128,12 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String startDate, String endDate) {
+    public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String startDate, String endDate,int limit) {
 
         LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
-        return repository.getExpenditureItemBasedOnGivenFilters(null,null,startLocalDate, endLocalDate,null);
+        return repository.getExpenditureItemBasedOnGivenFilters(null,null,startLocalDate, endLocalDate,null,limit);
     }
 
     @Override
@@ -191,7 +191,8 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 paymodes,
                 startLocalDate,
                 endLocalDate,
-                request.getCategories()
+                request.getCategories(),
+                Integer.MAX_VALUE
         );
     }
 
@@ -236,7 +237,8 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 paymodes,
                 startLocalDate,
                 endLocalDate,
-                request.getCategories()
+                request.getCategories(),
+                Integer.MAX_VALUE
         );
 
         ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();

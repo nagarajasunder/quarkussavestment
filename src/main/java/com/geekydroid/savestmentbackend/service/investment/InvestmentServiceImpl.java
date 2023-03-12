@@ -124,7 +124,7 @@ public class InvestmentServiceImpl implements InvestmentService {
         LocalDate localEndDate = DateUtils.fromStringToLocalDate(endDate);
 
         List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(localStartDate, localEndDate);
-        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsBasedOnGivenFilters(null, localStartDate, localEndDate, null, null);
+        List<EquityItem> recentEquityData = investmentRepository.getEquityItemsBasedOnGivenFilters(null, localStartDate, localEndDate, null, null,5);
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
         InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews, recentEquityData);
@@ -140,7 +140,7 @@ public class InvestmentServiceImpl implements InvestmentService {
         }
         LocalDate localStartDate = filterRequest.getFromDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getFromDate()) : null;
         LocalDate localEndDate = filterRequest.getToDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getToDate()) : null;
-        List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType());
+        List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType(),Integer.MAX_VALUE);
         return new Success(Response.Status.OK, null, results);
     }
 
@@ -148,7 +148,7 @@ public class InvestmentServiceImpl implements InvestmentService {
     public File exportDataToExcel(InvestmentFilterRequest filterRequest) {
         LocalDate localStartDate = filterRequest.getFromDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getFromDate()) : null;
         LocalDate localEndDate = filterRequest.getToDate() != null ? DateUtils.fromStringToLocalDate(filterRequest.getToDate()) : null;
-        List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType());
+        List<EquityItem> results = investmentRepository.getEquityItemsBasedOnGivenFilters(filterRequest.getEquityId(), localStartDate, localEndDate, filterRequest.getInvestmentCategories(), filterRequest.getTradeType(),Integer.MAX_VALUE);
         List<String> investmentTypes = investmentTypeRepository.getAllInvestmentCategories();
         return createExcel(investmentTypes,results);
     }

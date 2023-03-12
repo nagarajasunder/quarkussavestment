@@ -118,13 +118,13 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             List<Paymode> paymode,
             LocalDate fromDate,
             LocalDate toDate,
-            List<String> expenditureCategories
+            List<String> expenditureCategories,
+            int limit
     ) {
 
 
         Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, expenditureCategories);
-
-        return context.select(
+        SelectConditionStep<Record7<String, LocalDate, String, String, String, BigDecimal, Paymode>> selectQuery = context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
                         EXPENDITURE.DATE_OF_EXPENDITURE.as("expenditureDate"),
                         EXPENDITURE.EXPENDITURE_DESCRIPTION.as("expenditureDescription"),
@@ -139,8 +139,15 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 .on(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID))
                 .where(
                         condition
-                )
-                .fetchInto(ExpenditureItem.class);
+                );
+        if (limit != Integer.MAX_VALUE) {
+            return selectQuery
+                    .orderBy(EXPENDITURE.EXPENDITURE_NUMBER.desc())
+                    .limit(limit)
+                    .fetchInto(ExpenditureItem.class);
+        } else {
+            return selectQuery.fetchInto(ExpenditureItem.class);
+        }
     }
 
     private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, List<String> expenditureCategories) {

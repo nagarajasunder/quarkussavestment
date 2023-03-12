@@ -24,6 +24,7 @@ public interface InvestmentRepository {
             LocalDate fromDate,
             LocalDate toDate,
             List<String> investmentCategories,
-            String tradeType
+            String tradeType,
+            int limit
     );
 }
