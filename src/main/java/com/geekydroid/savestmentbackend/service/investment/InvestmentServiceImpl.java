@@ -8,7 +8,6 @@ import com.geekydroid.savestmentbackend.utils.InvestmentExcelGenerator;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.*;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -115,7 +114,12 @@ public class InvestmentServiceImpl implements InvestmentService {
         } catch (NotFoundException exception) {
             return new Exception(Response.Status.BAD_REQUEST, exception, null);
         }
-        return new Success(Response.Status.OK, null, "Equity with equity number " + equityNumber + " deleted successfully");
+        return new Success(Response.Status.OK, null, new GenericNetworkResponse(
+                Response.Status.OK.getStatusCode(),
+                "success",
+                "Equity with equity number " + equityNumber + " deleted successfully",
+                null
+        ));
     }
 
     @Override
