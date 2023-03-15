@@ -55,7 +55,7 @@ public class InvestmentResource {
     public Response getExpenditureBasedOnFilters(
             InvestmentFilterRequest request
     ) {
-        return ResponseUtil.getResponseFromResult(investmentService.getExpenditureItemBasedOnGivenFilters(request));
+        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentItemsBasedOnGivenFilters(request));
     }
 
     @POST

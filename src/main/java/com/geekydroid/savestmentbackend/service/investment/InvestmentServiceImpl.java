@@ -134,7 +134,7 @@ public class InvestmentServiceImpl implements InvestmentService {
     }
 
     @Override
-    public NetworkResponse getExpenditureItemBasedOnGivenFilters(InvestmentFilterRequest filterRequest) {
+    public NetworkResponse getInvestmentItemsBasedOnGivenFilters(InvestmentFilterRequest filterRequest) {
         if (filterRequest == null) {
             return new Error(Response.Status.BAD_REQUEST, new BadRequestException("Investment Filter request is empty"), null);
         }

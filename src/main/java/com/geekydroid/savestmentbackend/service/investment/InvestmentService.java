@@ -2,7 +2,6 @@ package com.geekydroid.savestmentbackend.service.investment;
 
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentFilterRequest;
-import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 import java.io.File;
@@ -18,7 +17,7 @@ public interface InvestmentService {
 
     NetworkResponse getInvestmentOverview(String startDate, String endDate);
 
-    NetworkResponse getExpenditureItemBasedOnGivenFilters(InvestmentFilterRequest filterRequest);
+    NetworkResponse getInvestmentItemsBasedOnGivenFilters(InvestmentFilterRequest filterRequest);
 
     File exportDataToExcel(InvestmentFilterRequest request);
 }
