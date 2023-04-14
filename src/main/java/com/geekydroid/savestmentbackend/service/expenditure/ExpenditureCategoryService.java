@@ -20,4 +20,8 @@ public interface ExpenditureCategoryService {
     ExpenditureCategory getExpenditureCategoryByName(String expenditureCategoryStr);
 
     List<ExpenditureCategoryResponse> getExpenditureCategoryResponse();
+
+    NetworkResponse deleteExpenditureCategories(List<String> categoryNames);
+
+    NetworkResponse updateExpenditureCategory(String existingCategory, String newValue);
 }

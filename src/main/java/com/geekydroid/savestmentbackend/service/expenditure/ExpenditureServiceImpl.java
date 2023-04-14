@@ -245,4 +245,14 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         return generator.createExcel(expenditureItems);
 
     }
+
+    @Override
+    @Transactional
+    public void deleteExpenditureByCategoryName(List<String> categoryNames) {
+        List<String> ExpenditureToBeDeleted = repository.getExpenditureNumberFromCategoryName(categoryNames);
+        if (ExpenditureToBeDeleted != null && !ExpenditureToBeDeleted.isEmpty()) {
+            Expenditure.deleteExpenditureByExpNumber(ExpenditureToBeDeleted);
+        }
+        ExpenditureCategory.deleteExpenditureCategoryByName(categoryNames);
+    }
 }

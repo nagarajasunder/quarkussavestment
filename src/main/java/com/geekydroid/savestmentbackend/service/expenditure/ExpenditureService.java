@@ -36,4 +36,6 @@ public interface ExpenditureService {
     NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate);
 
     File exportDataToExcel(ExpenditureFilterRequest filterRequest) throws IOException;
+
+    void deleteExpenditureByCategoryName(List<String> categoryNames);
 }

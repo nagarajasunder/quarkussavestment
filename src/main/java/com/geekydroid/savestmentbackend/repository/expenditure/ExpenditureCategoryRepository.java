@@ -19,4 +19,6 @@ public interface ExpenditureCategoryRepository {
 
     List<ExpenditureCategoryResponse> getExpenditureCategoryResponse();
 
+    void deleteExpenditureCategoryByName(List<String> categoryName);
+
 }

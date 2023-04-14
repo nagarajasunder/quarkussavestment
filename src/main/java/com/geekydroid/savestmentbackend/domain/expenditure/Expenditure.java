@@ -3,15 +3,26 @@ package com.geekydroid.savestmentbackend.domain.expenditure;
 import com.geekydroid.savestmentbackend.db.ExpenditureNumberSequenceGenerator;
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Parameters;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "EXPENDITURE")
+@NamedQueries(
+        {
+
+                @NamedQuery(
+                        name = "Expenditure.deleteByExpNumber",
+                        query = "delete from Expenditure e where e.expenditureNumber in ?1"
+                )
+        }
+)
 public class Expenditure extends PanacheEntityBase {
     @Id
     @GeneratedValue(
@@ -149,6 +160,10 @@ public class Expenditure extends PanacheEntityBase {
 
     public void setExpenditureCategory(ExpenditureCategory expenditureCategory) {
         this.expenditureCategory = expenditureCategory;
+    }
+
+    public static void deleteExpenditureByExpNumber(List<String> expNumber) {
+        delete("#Expenditure.deleteByExpNumber", expNumber);
     }
 
     @Override

@@ -150,6 +150,16 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         }
     }
 
+    @Override
+    public List<String> getExpenditureNumberFromCategoryName(List<String> categoryName) {
+        return context.select(EXPENDITURE.EXPENDITURE_NUMBER)
+                .from(EXPENDITURE)
+                .leftJoin(EXPENDITURE_CATEGORY)
+                .on(EXPENDITURE.EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID))
+                .where(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(categoryName))
+                .fetchInto(String.class);
+    }
+
     private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, List<String> expenditureCategories) {
         Condition condition = noCondition();
 

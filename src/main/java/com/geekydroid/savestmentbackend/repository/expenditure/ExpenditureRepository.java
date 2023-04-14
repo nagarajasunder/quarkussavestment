@@ -33,5 +33,7 @@ public interface ExpenditureRepository {
             int limit
     );
 
+    List<String> getExpenditureNumberFromCategoryName(List<String> categoryName);
+
     List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate,LocalDate endDate);
 }
