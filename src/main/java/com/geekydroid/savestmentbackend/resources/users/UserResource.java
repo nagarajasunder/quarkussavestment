@@ -37,4 +37,20 @@ public class UserResource {
 
     }
 
+    @Path("/userauth")
+    public Response userAuth(UserSignInRequest userSignInRequest) {
+        if (userSignInRequest == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("authentication request is empty")
+                    .build();
+        }
+        if (userSignInRequest.getUserEmailAddress() == null || userSignInRequest.getUserEmailAddress().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("User email address is empty")
+                    .build();
+        }
+
+        return ResponseUtil.getResponseFromResult(userService.authenticateUser(userSignInRequest));
+    }
+
 }

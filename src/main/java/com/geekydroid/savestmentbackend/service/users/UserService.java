@@ -5,6 +5,7 @@ import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 public interface UserService {
 
+    NetworkResponse authenticateUser(UserSignInRequest userSignInRequest);
     NetworkResponse createNewUser(UserSignInRequest userSignInRequest);
 
     Boolean verifyJwtToken(String userId,String jwtToken);
