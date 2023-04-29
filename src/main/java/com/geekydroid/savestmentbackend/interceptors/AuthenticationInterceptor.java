@@ -28,7 +28,7 @@ public class AuthenticationInterceptor implements ContainerRequestFilter {
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
         final String path = info.getPath();
-        System.out.println("Request from path "+path);
+
 
         if (!path.contains("signin")) {
             String accessToken = containerRequestContext.getHeaderString("Authorization");
@@ -38,7 +38,6 @@ public class AuthenticationInterceptor implements ContainerRequestFilter {
                 return;
             }
             accessToken = accessToken.substring(7);
-            System.out.println(accessToken);
             if (!userService.verifyJwtToken(userID,accessToken)) {
                 abortRequest(containerRequestContext);
             }

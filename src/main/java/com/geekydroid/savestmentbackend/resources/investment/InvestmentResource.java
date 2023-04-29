@@ -26,7 +26,6 @@ public class InvestmentResource {
     @Path("/addEquity")
     @Transactional
     public Response addEquity(List<EquityItem> equityItems) {
-        System.out.println("Resource " + equityItems);
         return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems));
     }
 

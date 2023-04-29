@@ -55,9 +55,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                 investmentItems.add(investmentItem);
             }
         }
-        System.out.println("Investment Items size " + investmentItems.size());
         if (investmentItems.size() > 0) {
-            System.out.println("INvestment Items " + investmentItems);
             List<InvestmentItem> investmentItemList = investmentRepository.addEquity(investmentItems);
             if (investmentItemList != null && investmentItemList.size() > 0) {
                 return new Success(Response.Status.CREATED, null, new GenericNetworkResponse(
@@ -132,7 +130,6 @@ public class InvestmentServiceImpl implements InvestmentService {
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
         InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews, recentEquityData);
-        System.out.println("getInvestmentOverview " + investmentOverview);
         return new Success(Response.Status.OK, null, investmentOverview);
 
     }

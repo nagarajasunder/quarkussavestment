@@ -35,7 +35,6 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
 
     @Override
     public void createNewExpenditureCategory(ExpenditureCategory expenditureCategory) {
-        System.out.println("Repo Method Called");
         expenditureCategory.persist();
     }
 

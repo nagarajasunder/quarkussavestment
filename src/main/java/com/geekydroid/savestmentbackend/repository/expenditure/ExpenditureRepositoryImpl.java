@@ -107,7 +107,6 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         List<Double> expenditureList = new ArrayList<>();
         expenditureList.add(0, totalExpense);
         expenditureList.add(1, totalIncome);
-        System.out.println(expenditureList);
         return expenditureList;
     }
 

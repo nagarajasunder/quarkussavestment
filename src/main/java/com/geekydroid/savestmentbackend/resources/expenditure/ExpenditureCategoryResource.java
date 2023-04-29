@@ -24,7 +24,6 @@ public class ExpenditureCategoryResource {
             @PathParam("expenditure_type") String expenditureType,
             @PathParam("category_name") String categoryName
     ) {
-        System.out.println("Method Called");
         if (expenditureType == null || categoryName == null || expenditureType.isEmpty() || categoryName.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Expenditure type or Category Name cannot be empty").build();
         }
