@@ -42,7 +42,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             throw new NotFoundException("Equity with equity number " + equityNumber + " does not exist");
         }
         LocalDateTime now = LocalDateTime.now();
-        entity.setInvestmentTypes(investmentType);
+        entity.setInvestmentType(investmentType);
         entity.setSymbol(equityItem.getSymbol());
         entity.setUnits(equityItem.getQuantity());
         entity.setPrice(equityItem.getPrice());
@@ -74,9 +74,9 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
     }
 
     @Override
-    public List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate) {
+    public List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate,String userId) {
 
-        Condition dateFilter = INVESTMENT_ITEMS.TRADE_DATE.between(startDate, endDate);
+        Condition dateFilter = INVESTMENT_ITEMS.CREATED_BY.eq(userId).and(INVESTMENT_ITEMS.TRADE_DATE.between(startDate, endDate));
 
         List<InvestmentTypeOverview> result = context
                 .select(
@@ -107,13 +107,14 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             String equityId,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> investmentCategories,
             String tradeType,
             int limit
     ) {
-        Condition condition = chainFilters(equityId, fromDate, toDate, investmentCategories, tradeType);
+        Condition condition = chainFilters(equityId, fromDate, toDate, userId,investmentCategories, tradeType);
 
-        SelectConditionStep<Record11<String, String, String, LocalDate, String, BigDecimal, BigDecimal, BigDecimal, UUID, String, String>> selectedQuery = context.select(
+        SelectConditionStep<Record11<String, String, String, LocalDate, String, BigDecimal, BigDecimal, BigDecimal, String, String, String>> selectedQuery = context.select(
                         INVESTMENT_ITEMS.INVESTMENT_ID.as("investment_number"),
                         INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_type"),
                         INVESTMENT_ITEMS.SYMBOL.as("symbol"),
@@ -147,10 +148,15 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             String equityId,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> investmentCategories,
             String tradeType
     ) {
         Condition condition = noCondition();
+
+        if (userId != null && !userId.isEmpty()) {
+            condition = condition.and(INVESTMENT_ITEMS.CREATED_BY.eq(userId));
+        }
 
         if (equityId != null && !equityId.isEmpty()) {
             condition = condition.and(INVESTMENT_ITEMS.INVESTMENT_ID.eq(equityId));

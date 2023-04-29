@@ -25,8 +25,8 @@ public class InvestmentResource {
     @POST()
     @Path("/addEquity")
     @Transactional
-    public Response addEquity(List<EquityItem> equityItems) {
-        return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems));
+    public Response addEquity(List<EquityItem> equityItems,@HeaderParam("user_id") String userId) {
+        return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems,userId));
     }
 
     @PUT()
@@ -45,28 +45,30 @@ public class InvestmentResource {
 
     @GET()
     @Path("/overview")
-    public Response getInvestmentOverview(@QueryParam("startDate") String startDate, @QueryParam("endDate") String endDate) {
-        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate, endDate));
+    public Response getInvestmentOverview(@QueryParam("startDate") String startDate, @QueryParam("endDate") String endDate,@HeaderParam("user_id") String userId) {
+        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate, endDate,userId));
     }
 
     @POST()
     @Path("/filterBy")
     public Response getExpenditureBasedOnFilters(
-            InvestmentFilterRequest request
+            InvestmentFilterRequest request,
+            @HeaderParam("user_id") String userId
     ) {
-        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentItemsBasedOnGivenFilters(request));
+        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentItemsBasedOnGivenFilters(request,userId));
     }
 
     @POST
     @Path("/exportData")
     public Response exportInvestmentData(
-            InvestmentFilterRequest request
+            InvestmentFilterRequest request,
+            @HeaderParam("user_id") String userId
     ) {
         if (request == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Investment Filter request cannot be null").build();
         }
 
-        File file = investmentService.exportDataToExcel(request);
+        File file = investmentService.exportDataToExcel(request,userId);
         if (file == null) {
             return Response.serverError().build();
         }

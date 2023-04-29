@@ -17,12 +17,13 @@ public interface InvestmentRepository {
 
     InvestmentItem findInvestmentItemById(String investmentNumber);
 
-    List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate);
+    List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate,String userId);
 
     List<EquityItem> getEquityItemsBasedOnGivenFilters(
             String equityId,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> investmentCategories,
             String tradeType,
             int limit

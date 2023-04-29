@@ -9,15 +9,15 @@ import java.util.List;
 
 public interface InvestmentService {
 
-    NetworkResponse addEquityItems(List<EquityItem> equityItems);
+    NetworkResponse addEquityItems(List<EquityItem> equityItems,String userId);
 
     NetworkResponse updateEquityItems(String EquityNumber,EquityItem equityItem);
 
     NetworkResponse deleteEquityItem(String equityNumber);
 
-    NetworkResponse getInvestmentOverview(String startDate, String endDate);
+    NetworkResponse getInvestmentOverview(String startDate, String endDate,String userId);
 
-    NetworkResponse getInvestmentItemsBasedOnGivenFilters(InvestmentFilterRequest filterRequest);
+    NetworkResponse getInvestmentItemsBasedOnGivenFilters(InvestmentFilterRequest filterRequest,String userId);
 
-    File exportDataToExcel(InvestmentFilterRequest request);
+    File exportDataToExcel(InvestmentFilterRequest request,String userId);
 }

@@ -5,5 +5,5 @@ import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 public interface HomeService {
 
-    NetworkResponse getHomeScreenData(String startDate, String endDate);
+    NetworkResponse getHomeScreenData(String startDate, String endDate,String userId);
 }

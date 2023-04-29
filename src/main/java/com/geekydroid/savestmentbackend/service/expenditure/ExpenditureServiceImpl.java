@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @ApplicationScoped
 @Transactional
@@ -33,17 +32,15 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     ExpenditureCategoryService expenditureCategoryService;
 
     @Override
-    public NetworkResponse createExpenditure(ExpenditureRequest expenditureRequest, ExpenditureCategory expenditureCategory) {
+    public NetworkResponse createExpenditure(String userId,ExpenditureRequest expenditureRequest, ExpenditureCategory expenditureCategory) {
         LocalDateTime now = LocalDateTime.now();
-        //Todo("To be removed")
-        expenditureRequest.setCreatedBy(UUID.randomUUID().toString());
         Expenditure newExpenditure = new Expenditure(
                 expenditureCategory,
                 expenditureRequest.getAmount(),
                 expenditureRequest.getNotes(),
                 expenditureRequest.getPaymode(),
                 DateUtils.fromStringToLocalDate(expenditureRequest.getExpenditureDate()),
-                UUID.fromString(expenditureRequest.getCreatedBy()),
+                userId,
                 now,
                 now
         );
@@ -80,6 +77,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         if (expenditureRequest.getPaymode() != null) {
             expenditure.setPaymode(expenditureRequest.getPaymode());
         }
+        expenditure.setUpdatedOn(LocalDateTime.now());
         Expenditure updatedExpenditure = repository.updateExpenditure(expNumber, expenditure);
         if (updatedExpenditure != null) {
             return new Success(Response.Status.OK, null, updatedExpenditure);
@@ -106,14 +104,14 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public ExpenditureOverview getExpenditureOverview(String startDate, String endDate) {
+    public ExpenditureOverview getExpenditureOverview(String userId,String startDate, String endDate) {
 
         LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
-        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(startLocalDate, endLocalDate);
-        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(startDate, endDate,5);
-        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(startLocalDate,endLocalDate);
+        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(userId,startLocalDate, endLocalDate);
+        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(userId,startDate, endDate,5);
+        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
 
         Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
 
@@ -128,12 +126,12 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String startDate, String endDate,int limit) {
+    public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String userId,String startDate, String endDate,int limit) {
 
         LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
-        return repository.getExpenditureItemBasedOnGivenFilters(null,null,startLocalDate, endLocalDate,null,limit);
+        return repository.getExpenditureItemBasedOnGivenFilters(null,null,startLocalDate, endLocalDate,userId,null,limit);
     }
 
     @Override
@@ -168,6 +166,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
     @Override
     public List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
+            String userId,
             ExpenditureFilterRequest request
     ) {
         LocalDate startLocalDate = null;
@@ -191,13 +190,14 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 paymodes,
                 startLocalDate,
                 endLocalDate,
+                userId,
                 request.getCategories(),
                 Integer.MAX_VALUE
         );
     }
 
     @Override
-    public NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate) {
+    public NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate,String userId) {
         LocalDate startLocalDate = null;
         LocalDate endLocalDate = null;
         if (startDate != null && !startDate.isEmpty()) {
@@ -208,13 +208,13 @@ public class ExpenditureServiceImpl implements ExpenditureService {
             endLocalDate = DateUtils.fromStringToLocalDate(endDate);
         }
 
-        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(startLocalDate,endLocalDate);
+        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
 
         return new Success(Response.Status.OK,null,categoryWiseExpenses);
     }
 
     @Override
-    public File exportDataToExcel(ExpenditureFilterRequest request) throws IOException {
+    public File exportDataToExcel(ExpenditureFilterRequest request,String userId) throws IOException {
 
         LocalDate startLocalDate = null;
         LocalDate endLocalDate = null;
@@ -237,6 +237,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 paymodes,
                 startLocalDate,
                 endLocalDate,
+                userId,
                 request.getCategories(),
                 Integer.MAX_VALUE
         );

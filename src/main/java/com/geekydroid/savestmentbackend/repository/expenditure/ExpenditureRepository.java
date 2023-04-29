@@ -22,18 +22,19 @@ public interface ExpenditureRepository {
 
     Expenditure getExpenditureByExpNumber(String expNumber);
 
-    List<Double> getTotalExpenseAndIncomeAmount(LocalDate startDate, LocalDate endDate);
+    List<Double> getTotalExpenseAndIncomeAmount(String userId,LocalDate startDate, LocalDate endDate);
 
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
             String expenditureType,
             List<Paymode> paymodes,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> expenditureCategories,
             int limit
     );
 
     List<String> getExpenditureNumberFromCategoryName(List<String> categoryName);
 
-    List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate,LocalDate endDate);
+    List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(String userId,LocalDate startDate,LocalDate endDate);
 }

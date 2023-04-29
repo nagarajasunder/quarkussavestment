@@ -13,7 +13,7 @@ import java.util.List;
 @Transactional
 public interface ExpenditureCategoryService {
 
-    NetworkResponse createNewExpenditureCategory(String expenditureType, String categoryName);
+    NetworkResponse createNewExpenditureCategory(String expenditureType, String categoryName,String userId);
 
     List<ExpenditureCategory> getAllExpenditureCategories();
 

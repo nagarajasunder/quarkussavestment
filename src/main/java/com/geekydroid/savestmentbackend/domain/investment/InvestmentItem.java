@@ -2,6 +2,8 @@ package com.geekydroid.savestmentbackend.domain.investment;
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import com.geekydroid.savestmentbackend.db.EquityNumberSequenceGenerator;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "INVESTMENT_ITEMS")
+@Getter
+@Setter
 public class InvestmentItem extends PanacheEntityBase {
 
     @GenericGenerator(
@@ -59,7 +63,7 @@ public class InvestmentItem extends PanacheEntityBase {
     private Double amountInvested;
 
     @Column(name = "CREATED_BY")
-    private UUID createdBy;
+    private String createdBy;
 
     @Column(name = "CREATED_ON")
     private LocalDateTime createdOn;
@@ -68,7 +72,7 @@ public class InvestmentItem extends PanacheEntityBase {
     @Column(name = "UPDATED_ON")
     private LocalDateTime updatedOn;
 
-    public InvestmentItem(InvestmentType investmentType, String symbol, LocalDate tradeDate, String tradeType, Double units, Double price, Double amountInvested, UUID createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
+    public InvestmentItem(InvestmentType investmentType, String symbol, LocalDate tradeDate, String tradeType, Double units, Double price, Double amountInvested, String createdBy, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.investmentType = investmentType;
         this.symbol = symbol;
         this.tradeDate = tradeDate;
@@ -84,100 +88,5 @@ public class InvestmentItem extends PanacheEntityBase {
     public InvestmentItem() {
     }
 
-    public String getInvestmentId() {
-        return investmentId;
-    }
-
-    public void setInvestmentId(String investmentId) {
-        this.investmentId = investmentId;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public LocalDate getTradeDate() {
-        return tradeDate;
-    }
-
-    public void setTradeDate(LocalDate tradeDate) {
-        this.tradeDate = tradeDate;
-    }
-
-    public InvestmentType getInvestmentType() {
-        return investmentType;
-    }
-
-    public void setInvestmentType(InvestmentType investmentType) {
-        this.investmentType = investmentType;
-    }
-
-    public String getTradeType() {
-        return tradeType;
-    }
-
-    public void setTradeType(String tradeType) {
-        this.tradeType = tradeType;
-    }
-
-    public Double getUnits() {
-        return units;
-    }
-
-    public void setUnits(Double units) {
-        this.units = units;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Double getAmountInvested() {
-        return amountInvested;
-    }
-
-    public void setAmountInvested(Double amountInvested) {
-        this.amountInvested = amountInvested;
-    }
-
-    public UUID getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(UUID createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public LocalDateTime getUpdatedOn() {
-        return updatedOn;
-    }
-
-    public void setUpdatedOn(LocalDateTime updatedOn) {
-        this.updatedOn = updatedOn;
-    }
-
-    public InvestmentType getInvestmentTypes() {
-        return investmentType;
-    }
-
-    public void setInvestmentTypes(InvestmentType investmentType) {
-        this.investmentType = investmentType;
-    }
 }
 

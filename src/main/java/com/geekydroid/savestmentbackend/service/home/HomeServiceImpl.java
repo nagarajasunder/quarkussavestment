@@ -30,14 +30,14 @@ public class HomeServiceImpl implements HomeService {
     ExpenditureRepository expenditureRepository;
 
     @Override
-    public NetworkResponse getHomeScreenData(String startDate, String endDate) {
+    public NetworkResponse getHomeScreenData(String startDate, String endDate,String userId) {
 
         LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
-        List<Double> totalExpenditures = expenditureRepository.getTotalExpenseAndIncomeAmount(startLocalDate, endLocalDate);
+        List<Double> totalExpenditures = expenditureRepository.getTotalExpenseAndIncomeAmount(userId,startLocalDate, endLocalDate);
 
-        List<CategoryWiseExpense> categoryWiseExpenses = expenditureRepository.getCategoryWiseExpenseByGivenDateRange(startLocalDate, endLocalDate);
+        List<CategoryWiseExpense> categoryWiseExpenses = expenditureRepository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate, endLocalDate);
 
         Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
 
@@ -49,7 +49,7 @@ public class HomeServiceImpl implements HomeService {
                 List.of()
         );
 
-        List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(startLocalDate, endLocalDate);
+        List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(startLocalDate, endLocalDate,userId);
 
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));

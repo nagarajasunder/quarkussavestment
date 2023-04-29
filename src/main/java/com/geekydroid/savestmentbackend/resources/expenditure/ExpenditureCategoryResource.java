@@ -22,13 +22,14 @@ public class ExpenditureCategoryResource {
     @Path("/{expenditure_type}/{category_name}")
     public Response createNewExpenditureCategory(
             @PathParam("expenditure_type") String expenditureType,
-            @PathParam("category_name") String categoryName
+            @PathParam("category_name") String categoryName,
+            @HeaderParam("user_id") String userId
     ) {
         if (expenditureType == null || categoryName == null || expenditureType.isEmpty() || categoryName.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Expenditure type or Category Name cannot be empty").build();
         }
 
-        return ResponseUtil.getResponseFromResult(service.createNewExpenditureCategory(expenditureType,categoryName));
+        return ResponseUtil.getResponseFromResult(service.createNewExpenditureCategory(expenditureType,categoryName,userId));
     }
 
     @GET()

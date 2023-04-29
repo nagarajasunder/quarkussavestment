@@ -19,13 +19,14 @@ public class HomeResource {
     @GET
     public Response getHomeScreenData(
             @QueryParam("start_date") String startDate,
-            @QueryParam("end_date") String endDate
+            @QueryParam("end_date") String endDate,
+            @HeaderParam("user_id") String userId
     ) {
         if (startDate == null || endDate == null || startDate.isEmpty() || endDate.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Start Date and End Date cannot be empty!").build();
         }
 
-        return ResponseUtil.getResponseFromResult(homeService.getHomeScreenData(startDate,endDate));
+        return ResponseUtil.getResponseFromResult(homeService.getHomeScreenData(startDate,endDate,userId));
 
     }
 

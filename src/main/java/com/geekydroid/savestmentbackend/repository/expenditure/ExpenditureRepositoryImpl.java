@@ -63,9 +63,9 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     }
 
     @Override
-    public List<Double> getTotalExpenseAndIncomeAmount(LocalDate startDate, LocalDate endDate) {
+    public List<Double> getTotalExpenseAndIncomeAmount(String userId,LocalDate startDate, LocalDate endDate) {
 
-        Condition dateFilter = EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate);
+        Condition dateFilter = EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate).and(EXPENDITURE.CREATED_BY.eq(userId));
 
         Result<Record2<BigDecimal, String>> result = context
                 .select(
@@ -117,12 +117,13 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             List<Paymode> paymode,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> expenditureCategories,
             int limit
     ) {
 
 
-        Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, expenditureCategories);
+        Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, userId,expenditureCategories);
         SelectConditionStep<Record7<String, LocalDate, String, String, String, BigDecimal, Paymode>> selectQuery = context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
                         EXPENDITURE.DATE_OF_EXPENDITURE.as("expenditureDate"),
@@ -159,8 +160,12 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 .fetchInto(String.class);
     }
 
-    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, List<String> expenditureCategories) {
+    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, String userId,List<String> expenditureCategories) {
         Condition condition = noCondition();
+
+        if (userId != null && !userId.isEmpty()) {
+            condition = condition.and(EXPENDITURE.CREATED_BY.eq(userId));
+        }
 
         if (expenditureType != null && !expenditureType.isEmpty()) {
             condition = condition.and(EXPENDITURE_TYPE.EXPENDITURE_NAME.equalIgnoreCase(expenditureType));
@@ -183,7 +188,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     }
 
     @Override
-    public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate, LocalDate endDate) {
+    public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(String userId,LocalDate startDate, LocalDate endDate) {
 
 
         return context.select(
@@ -200,7 +205,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         ).on(
                 EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID).and(EXPENDITURE_TYPE.EXPENDITURE_NAME.eq("Expense"))
         ).where(
-                EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate)
+                EXPENDITURE.CREATED_BY.eq(userId).and(EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate))
         ).groupBy(
                 EXPENDITURE_CATEGORY.CATEGORY_NAME
         ).fetchInto(CategoryWiseExpense.class);

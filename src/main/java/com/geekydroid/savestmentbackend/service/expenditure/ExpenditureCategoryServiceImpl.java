@@ -29,7 +29,7 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
 
 
     @Override
-    public NetworkResponse createNewExpenditureCategory(String expenditureTypeName, String categoryName) {
+    public NetworkResponse createNewExpenditureCategory(String expenditureTypeName, String categoryName,String userId) {
 
         LocalDateTime now = LocalDateTime.now();
         String expenditureTypeQueryString = String.valueOf(expenditureTypeName.charAt(0)).toUpperCase() + expenditureTypeName.substring(1).toLowerCase();
@@ -41,7 +41,7 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
                 expenditureType,
                 categoryName,
                 false,
-                "",
+                userId,
                 now,
                 now
         );
