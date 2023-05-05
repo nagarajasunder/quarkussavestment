@@ -15,11 +15,11 @@ public interface ExpenditureCategoryService {
 
     NetworkResponse createNewExpenditureCategory(String expenditureType, String categoryName,String userId);
 
-    List<ExpenditureCategory> getAllExpenditureCategories();
+    List<ExpenditureCategory> getAllExpenditureCategories(String userId);
 
     ExpenditureCategory getExpenditureCategoryByName(String expenditureCategoryStr);
 
-    List<ExpenditureCategoryResponse> getExpenditureCategoryResponse();
+    List<ExpenditureCategoryResponse> getExpenditureCategoryResponse(String userId);
 
     NetworkResponse deleteExpenditureCategories(List<String> categoryNames);
 

@@ -13,11 +13,11 @@ public interface ExpenditureCategoryRepository {
 
     void createNewExpenditureCategory(ExpenditureCategory expenditureCategory);
 
-    List<ExpenditureCategory> getAllExpenditureCategories();
+    List<ExpenditureCategory> getAllExpenditureCategories(String userId);
 
     ExpenditureCategory getExpenditureCategoryName(String expenditureCategoryStr);
 
-    List<ExpenditureCategoryResponse> getExpenditureCategoryResponse();
+    List<ExpenditureCategoryResponse> getExpenditureCategoryResponse(String userId);
 
     void deleteExpenditureCategoryByName(List<String> categoryName);
 

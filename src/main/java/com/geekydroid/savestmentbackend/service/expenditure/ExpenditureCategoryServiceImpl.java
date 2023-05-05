@@ -56,8 +56,8 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
     }
 
     @Override
-    public List<ExpenditureCategory> getAllExpenditureCategories() {
-        return repository.getAllExpenditureCategories();
+    public List<ExpenditureCategory> getAllExpenditureCategories(String userId) {
+        return repository.getAllExpenditureCategories(userId);
     }
 
     @Override
@@ -66,8 +66,8 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
     }
 
     @Override
-    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse() {
-        return repository.getExpenditureCategoryResponse();
+    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse(String userId) {
+        return repository.getExpenditureCategoryResponse(userId);
     }
 
     @Override

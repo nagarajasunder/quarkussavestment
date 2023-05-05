@@ -1,9 +1,9 @@
-drop table if exists EXPENDITURE;
-drop table if exists INVESTMENT_ITEMS;
-drop table if exists EXPENDITURE_CATEGORY;
-drop table if exists INVESTMENT_TYPES;
-drop table if exists EXPENDITURE_TYPE;
 drop table if exists SAVESTMENT_USERS;
+drop table if exists INVESTMENT_TYPES;
+drop table if exists INVESTMENT_ITEMS;
+drop table if exists EXPENDITURE_TYPE;
+drop table if exists EXPENDITURE_CATEGORY;
+drop table if exists EXPENDITURE;
 
 CREATE TABLE IF NOT EXISTS SAVESTMENT_USERS
 (
@@ -97,6 +97,11 @@ VALUES
 (3,2,'Food',true,'SYSTEM',now(),now()),
 (4,2,'Electricity',true,'SYSTEM',now(),now());
 
+INSERT INTO EXPENDITURE (EXPENDITURE_NUMBER,EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID,EXPENDITURE_AMOUNT,EXPENDITURE_DESCRIPTION,MODE_OF_PAYMENT,DATE_OF_EXPENDITURE,CREATED_ON,UPDATED_ON) VALUES
+('EXP-25',1,45000,'Monthly Salary',0,'2023-02-01',now(),now()),
+('EXP-23',2,4400,'Monthly Rent',0,'2023-02-04',now(),now()),
+('EXP-21',3,599,'Breakfast',0,'2023-02-14',now(),now()),
+('EXP-20',3,45,'Dinner',1,'2023-01-12',now(),now());
 
 INSERT INTO INVESTMENT_TYPES (INVESTMENT_TYPE_ID,INVESTMENT_NAME,CREATED_ON,UPDATED_ON)
 VALUES

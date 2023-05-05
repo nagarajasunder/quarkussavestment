@@ -1,22 +1,27 @@
-version: '3'
-
+version: '2'
 services:
-  quarkus:
-    build: .
+
+  postgres:
+    image: postgres:11-alpine
+    container_name: "postgres-database"
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "container-db"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  my-quarkus-app:
+    container_name: quarkus-app
+    image: quarkus-savestment:latest
+    expose:
+      - 8080
     ports:
       - "8080:8080"
+    environment:
+      MY_NAME: "Evyatar"
     depends_on:
-      - db
-    environment:
-      - QUARKUS_DATASOURCE_URL=jdbc:postgresql://db:5433/savestment
-      - QUARKUS_DATASOURCE_USERNAME=postgres
-      - QUARKUS_DATASOURCE_PASSWORD=postgres
-  db:
-    image: postgres
-    ports:
-      - 5433:5432
-    environment:
-      - POSTGRES_DB=savestment
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST_AUTH_METHOD=md5
+      - postgres

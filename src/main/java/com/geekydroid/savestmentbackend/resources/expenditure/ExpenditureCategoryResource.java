@@ -33,8 +33,8 @@ public class ExpenditureCategoryResource {
     }
 
     @GET()
-    public List<ExpenditureCategoryResponse> getExpenditureCategories() {
-        return service.getExpenditureCategoryResponse();
+    public List<ExpenditureCategoryResponse> getExpenditureCategories(@HeaderParam("user_id") String userId) {
+        return service.getExpenditureCategoryResponse(userId);
     }
 
     @POST()

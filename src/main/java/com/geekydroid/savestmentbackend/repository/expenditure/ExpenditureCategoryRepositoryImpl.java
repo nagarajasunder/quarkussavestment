@@ -39,9 +39,11 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
     }
 
     @Override
-    public List<ExpenditureCategory> getAllExpenditureCategories() {
+    public List<ExpenditureCategory> getAllExpenditureCategories(String userId) {
         return context.select()
-                .from(EXPENDITURE_CATEGORY).fetchInto(ExpenditureCategory.class);
+                .from(EXPENDITURE_CATEGORY)
+                .where(EXPENDITURE_CATEGORY.IS_COMMON.eq(true).or(EXPENDITURE_CATEGORY.CREATED_BY.eq(userId)))
+                .fetchInto(ExpenditureCategory.class);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
     }
 
     @Override
-    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse() {
+    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse(String userId) {
 
         List<ExpenditureCategoryResponse> response = new ArrayList<>();
 
@@ -61,13 +63,14 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
                 .from(EXPENDITURE_TYPE)
                 .join(EXPENDITURE_CATEGORY)
                 .on(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID))
+                .where(EXPENDITURE_CATEGORY.IS_COMMON.eq(true).or(EXPENDITURE_CATEGORY.CREATED_BY.eq(userId)))
                 .groupBy(EXPENDITURE_TYPE.EXPENDITURE_NAME)
                 .fetch();
 
         for (Record r : expenditureCategories) {
             String expenditureTypeName = r.getValue(EXPENDITURE_TYPE.EXPENDITURE_NAME);
             List<String> expenditureCategoryList = Arrays.stream(r.getValue(EXPENDITURE_CATEGORY.CATEGORY_NAME).split(",")).toList();
-            response.add(new ExpenditureCategoryResponse(expenditureTypeName,expenditureCategoryList));
+            response.add(new ExpenditureCategoryResponse(expenditureTypeName, expenditureCategoryList));
         }
 
         return response;
