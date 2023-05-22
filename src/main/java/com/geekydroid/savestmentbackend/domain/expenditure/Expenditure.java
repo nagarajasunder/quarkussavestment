@@ -49,7 +49,7 @@ public class Expenditure extends PanacheEntityBase {
     @JoinColumn(name = "expenditure_category_expenditure_category_id")
     private ExpenditureCategory expenditureCategory;
 
-    @Column(name = "expenditure_amount")
+    @Column(name = "expenditure_amount",columnDefinition = "NUMERIC")
     private Double expenditureAmount;
 
     @Column(name = "expenditure_description")

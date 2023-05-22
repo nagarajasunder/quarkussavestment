@@ -75,15 +75,7 @@
 #   accessed directly. (example: "foo.example.com,bar.example.com")
 #
 ###
-
-#sudo docker volume create portainer_data
-# sudo docker run -d -p 9000:9000 -p 8000:8000 --name=portainer-s -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-
-#build for arm architecture
-# docker buildx build --platform linux/arm64 -t <tagname> <path_of_the_docker_file>
-
-
-FROM registry.access.redhat.com/ubi8/openjdk-17:1.14
+FROM hypriot/rpi-java
 
 ENV LANGUAGE='en_US:en'
 
@@ -97,9 +89,6 @@ COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8080
 USER 185
-ENV QUARKUS_DATASOURCE_PASSWORD="LhH[bmz/2Rw%@[%x9^Z<"
-ENV QUARKUS_DATASOURCE_JDBC_URL="jdbc:postgresql://postgres:5432/savestment"
 ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
-
 

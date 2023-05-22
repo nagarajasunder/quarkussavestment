@@ -25,22 +25,24 @@ public class UserRepositoryImpl implements UserRepository {
     JWTVerifier verifier = JWT.require(algorithm).build();
 
     @Override
-    public String createJwtToken(String userId, Date issuedAt, Date expiredAt) {
+    public String createJwtToken(String userId, String userUuid, Date issuedAt, Date expiredAt) {
 
         return JWT.create()
                 .withIssuer("Savestment")
                 .withClaim("user_id",userId)
+                .withClaim("reference_id",userUuid)
                 .withIssuedAt(issuedAt)
                 .withExpiresAt(expiredAt)
                 .sign(algorithm);
     }
 
     @Override
-    public Boolean verifyJwtToken(String userId,String jwtToken) {
+    public Boolean verifyJwtToken(String userId,String userReferenceId,String jwtToken) {
         try {
             DecodedJWT decodedJWT = verifier.verify(jwtToken);
             String tokenUserId = decodedJWT.getClaim("user_id").asString();
-            return ((Objects.equals(userId, tokenUserId)) && decodedJWT.getExpiresAt().after(new Date(System.currentTimeMillis())));
+            String tokenUserReferenceId = decodedJWT.getClaim("reference_id").asString();
+            return ((Objects.equals(userId, tokenUserId)) && (Objects.equals(userReferenceId,tokenUserReferenceId)) && decodedJWT.getExpiresAt().after(new Date(System.currentTimeMillis())));
         }
         catch (JWTVerificationException e) {
             return false;

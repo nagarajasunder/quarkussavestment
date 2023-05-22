@@ -53,13 +53,13 @@ public class InvestmentItem extends PanacheEntityBase {
     @Column(name = "TRADE_TYPE")
     private String tradeType;
 
-    @Column(name = "UNITS")
+    @Column(name = "UNITS",columnDefinition = "NUMERIC")
     private Double units;
 
-    @Column(name = "PRICE")
+    @Column(name = "PRICE",columnDefinition = "NUMERIC")
     private Double price;
 
-    @Column(name = "AMOUNT_INVESTED")
+    @Column(name = "AMOUNT_INVESTED",columnDefinition = "NUMERIC")
     private Double amountInvested;
 
     @Column(name = "CREATED_BY")

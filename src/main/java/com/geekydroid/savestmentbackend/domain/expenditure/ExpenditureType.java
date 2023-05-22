@@ -4,6 +4,8 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Entity
 @Table(name = "EXPENDITURE_TYPE")
@@ -31,6 +33,9 @@ public class ExpenditureType extends PanacheEntityBase {
 
     @Column(name = "updated_on")
     private LocalDateTime updatedOn;
+
+    @OneToMany(mappedBy = "expenditureType")
+    private List<ExpenditureCategory> expenditureCategoryCollection;
 
     public ExpenditureType(String expenditureName, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.expenditureName = expenditureName;

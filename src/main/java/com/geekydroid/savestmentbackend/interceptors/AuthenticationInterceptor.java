@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
@@ -31,14 +32,16 @@ public class AuthenticationInterceptor implements ContainerRequestFilter {
 
 
         if (!path.contains("signin")) {
+            MultivaluedMap<String,String> allHeaders = containerRequestContext.getHeaders();
             String accessToken = containerRequestContext.getHeaderString("Authorization");
             String userID = containerRequestContext.getHeaderString("user_id");
-            if (userID == null || userID.isEmpty() || accessToken == null || !accessToken.startsWith("Bearer ")) {
+            String userReferenceId = containerRequestContext.getHeaderString("reference_id");
+            if (userID == null || userID.isEmpty() || userReferenceId == null || userReferenceId.isEmpty() || accessToken == null || !accessToken.startsWith("Bearer ")) {
                 abortRequest(containerRequestContext);
                 return;
             }
             accessToken = accessToken.substring(7);
-            if (!userService.verifyJwtToken(userID,accessToken)) {
+            if (!userService.verifyJwtToken(userID,userReferenceId,accessToken)) {
                 abortRequest(containerRequestContext);
             }
         }

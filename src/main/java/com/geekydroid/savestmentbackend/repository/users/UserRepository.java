@@ -6,9 +6,9 @@ import java.util.Date;
 
 public interface UserRepository {
 
-    String createJwtToken(String userId, Date issuedAt, Date expiredAt);
+    String createJwtToken(String userId, String userUuid,Date issuedAt, Date expiredAt);
 
-    Boolean verifyJwtToken(String userId,String jwtToken);
+    Boolean verifyJwtToken(String userId,String userReferenceId,String jwtToken);
 
     User createNewUser(User newUser);
 

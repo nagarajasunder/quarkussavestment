@@ -66,16 +66,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean verifyJwtToken(String userId, String jwtToken) {
-        if (jwtToken == null || jwtToken.isEmpty() || userId == null || userId.isEmpty()) {
+    public Boolean verifyJwtToken(String userId, String userReferenceId, String jwtToken) {
+        if (jwtToken == null || jwtToken.isEmpty() || userId == null || userId.isEmpty() || userReferenceId == null || userReferenceId.isEmpty()) {
             return false;
         }
-        return userRepository.verifyJwtToken(userId, jwtToken);
+        return userRepository.verifyJwtToken(userId, userReferenceId, jwtToken);
     }
 
     private Success generateAccessToken(User existingUser) {
         long expiryTime = 24*60*60*1000L;
-        String accessToken = userRepository.createJwtToken(existingUser.getUserId(), new Date(), new Date(System.currentTimeMillis() + expiryTime));
+        String uuid = UUID.randomUUID().toString();
+        String accessToken = userRepository.createJwtToken(existingUser.getUserId(), uuid, new Date(), new Date(System.currentTimeMillis() + expiryTime));
         return new Success(
                 Response.Status.CREATED,
                 null,

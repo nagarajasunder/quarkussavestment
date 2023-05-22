@@ -8,6 +8,6 @@ public interface UserService {
     NetworkResponse authenticateUser(UserSignInRequest userSignInRequest);
     NetworkResponse createNewUser(UserSignInRequest userSignInRequest);
 
-    Boolean verifyJwtToken(String userId,String jwtToken);
+    Boolean verifyJwtToken(String userId,String userReferenceId,String jwtToken);
 
 }
