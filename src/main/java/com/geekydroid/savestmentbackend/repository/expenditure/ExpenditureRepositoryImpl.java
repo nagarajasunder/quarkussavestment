@@ -143,7 +143,9 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                     .limit(limit)
                     .fetchInto(ExpenditureItem.class);
         } else {
-            return selectQuery.fetchInto(ExpenditureItem.class);
+            return selectQuery
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
+                    .fetchInto(ExpenditureItem.class);
         }
     }
 
