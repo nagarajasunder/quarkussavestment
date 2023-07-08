@@ -1,0 +1,43 @@
+version: '3'
+volumes:
+  savestment_pg_volume:
+services:
+  postgres:
+    image: postgres:11-alpine
+    container_name: "postgres-database"
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "container-db"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - savestment_pg_volume:/var/lib/postgresql/data
+    user: "postgres:postgres"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "dev@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "postgres"
+    depends_on:
+      - postgres
+
+
+  my-quarkus-app:
+    container_name: quarkus-app
+    image: geekydroid/savestment:latest
+    expose:
+      - 8080
+    ports:
+      - "8080:8080"
+    environment:
+      MY_NAME: "Evyatar"
+    depends_on:
+      - postgres
+
+
