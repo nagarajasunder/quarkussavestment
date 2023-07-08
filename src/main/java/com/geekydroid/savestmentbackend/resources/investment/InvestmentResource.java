@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.List;
 
+import static com.geekydroid.savestmentbackend.utils.Constants.USER_ID_HEADER_PARAM_KEY;
+
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/investment")
@@ -25,8 +27,8 @@ public class InvestmentResource {
     @POST()
     @Path("/addEquity")
     @Transactional
-    public Response addEquity(List<EquityItem> equityItems,@HeaderParam("user_id") String userId) {
-        return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems,userId));
+    public Response addEquity(List<EquityItem> equityItems, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
+        return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems, userId));
     }
 
     @PUT()
@@ -45,15 +47,15 @@ public class InvestmentResource {
 
     @GET()
     @Path("/overview")
-    public Response getInvestmentOverview(@QueryParam("startDate") String startDate, @QueryParam("endDate") String endDate,@HeaderParam("user_id") String userId) {
-        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate, endDate,userId));
+    public Response getInvestmentOverview(@QueryParam("startDate") String startDate, @QueryParam("endDate") String endDate, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
+        return ResponseUtil.getResponseFromResult(investmentService.getInvestmentOverview(startDate, endDate, userId));
     }
 
     @POST()
     @Path("/filterBy")
     public Response getExpenditureBasedOnFilters(
             InvestmentFilterRequest request,
-            @HeaderParam("user_id") String userId
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
     ) {
         return ResponseUtil.getResponseFromResult(investmentService.getInvestmentItemsBasedOnGivenFilters(request,userId));
     }
@@ -62,7 +64,7 @@ public class InvestmentResource {
     @Path("/exportData")
     public Response exportInvestmentData(
             InvestmentFilterRequest request,
-            @HeaderParam("user_id") String userId
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
     ) {
         if (request == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Investment Filter request cannot be null").build();

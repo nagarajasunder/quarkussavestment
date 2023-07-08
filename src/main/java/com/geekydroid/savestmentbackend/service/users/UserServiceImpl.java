@@ -6,9 +6,7 @@ import com.geekydroid.savestmentbackend.domain.users.UserSignInResponse;
 import com.geekydroid.savestmentbackend.repository.users.UserRepository;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
-import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
-import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
-import com.geekydroid.savestmentbackend.utils.models.Success;
+import com.geekydroid.savestmentbackend.utils.models.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -28,10 +26,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public NetworkResponse authenticateUser(UserSignInRequest userSignInRequest) {
         User existingUser = userRepository.findUserByEmail(userSignInRequest.getUserEmailAddress());
-    if (existingUser != null) {
-        return generateAccessToken(existingUser);
-    }
-    return new Exception(Response.Status.BAD_REQUEST,null,"User doesn't exist");
+        if (existingUser != null) {
+            return generateAccessToken(existingUser);
+        }
+        return new Exception(Response.Status.BAD_REQUEST, null, "User doesn't exist");
     }
 
     @Override

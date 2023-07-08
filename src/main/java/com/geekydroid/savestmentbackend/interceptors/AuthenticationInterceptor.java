@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
@@ -29,19 +28,16 @@ public class AuthenticationInterceptor implements ContainerRequestFilter {
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
         final String path = info.getPath();
-
-
-        if (!path.contains("signin")) {
-            MultivaluedMap<String,String> allHeaders = containerRequestContext.getHeaders();
+        if (!path.contains("signin") && !path.contains("userauth")) {
             String accessToken = containerRequestContext.getHeaderString("Authorization");
-            String userID = containerRequestContext.getHeaderString("user_id");
-            String userReferenceId = containerRequestContext.getHeaderString("reference_id");
+            String userID = containerRequestContext.getHeaderString("UserId");
+            String userReferenceId = containerRequestContext.getHeaderString("ReferenceId");
             if (userID == null || userID.isEmpty() || userReferenceId == null || userReferenceId.isEmpty() || accessToken == null || !accessToken.startsWith("Bearer ")) {
                 abortRequest(containerRequestContext);
                 return;
             }
             accessToken = accessToken.substring(7);
-            if (!userService.verifyJwtToken(userID,userReferenceId,accessToken)) {
+            if (!userService.verifyJwtToken(userID, userReferenceId, accessToken)) {
                 abortRequest(containerRequestContext);
             }
         }

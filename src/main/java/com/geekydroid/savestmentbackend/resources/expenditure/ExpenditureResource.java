@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import static com.geekydroid.savestmentbackend.utils.Constants.USER_ID_HEADER_PARAM_KEY;
+
 @Path("/expenditure")
 public class ExpenditureResource {
 
@@ -28,14 +30,14 @@ public class ExpenditureResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addNewExpenditure(ExpenditureRequest request,@HeaderParam("user_id") String userId) {
+    public Response addNewExpenditure(ExpenditureRequest request, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
         String expenditureCategoryStr = request.getExpenditureCategory();
         ExpenditureCategory expenditureCategory = expenditureCategoryService.getExpenditureCategoryByName(expenditureCategoryStr);
         if (expenditureCategory == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .build();
         }
-        NetworkResponse response = expenditureService.createExpenditure(userId,request, expenditureCategory);
+        NetworkResponse response = expenditureService.createExpenditure(userId, request, expenditureCategory);
 
         return ResponseUtil.getResponseFromResult(response);
     }
@@ -64,7 +66,7 @@ public class ExpenditureResource {
     public ExpenditureOverview getExpenditureOverview(
             @QueryParam("startDate") String startDate,
             @QueryParam("endDate") String endDate,
-            @HeaderParam("user_id") String userId
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
     ) {
         return expenditureService.getExpenditureOverview(userId,startDate, endDate);
     }
@@ -77,7 +79,7 @@ public class ExpenditureResource {
     @POST()
     @Path("/filterBy")
     public List<ExpenditureItem> getExpenditureBasedOnFilters(
-            @HeaderParam("user_id") String userId,
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId,
             ExpenditureFilterRequest request
     ) {
         return expenditureService.getExpenditureItemBasedOnGivenFilters(userId,request);
@@ -85,18 +87,18 @@ public class ExpenditureResource {
 
     @GET
     @Path("/categoryWise")
-    public Response getCategoryWiseExpense(@QueryParam("start_date") String startDate, @QueryParam("end_date") String endDate,@HeaderParam("user_id") String userId) {
+    public Response getCategoryWiseExpense(@QueryParam("start_date") String startDate, @QueryParam("end_date") String endDate, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
         if (startDate == null || endDate == null || startDate.isEmpty() || endDate.isEmpty()) {
             return ResponseUtil.getResponseFromResult(new Error(Response.Status.BAD_REQUEST, new BadRequestException("Start date and End date should not be empty!"), null));
         }
-        return ResponseUtil.getResponseFromResult(expenditureService.getCategoryWiseExpenseByGivenDateRange(startDate,endDate,userId));
+        return ResponseUtil.getResponseFromResult(expenditureService.getCategoryWiseExpenseByGivenDateRange(startDate, endDate, userId));
     }
 
     @POST()
     @Path("/exportData")
     public Response exportData(
             ExpenditureFilterRequest request,
-            @HeaderParam("user_id") String userId
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
     ) throws IOException {
         if (request == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Expenditure Request cannot be null").build();

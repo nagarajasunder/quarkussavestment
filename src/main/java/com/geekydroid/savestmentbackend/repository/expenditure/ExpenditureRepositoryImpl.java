@@ -90,18 +90,15 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
          * 2. Income
          * So the size should be at least 2
          */
-        if ((long) result.size() >= 2L) {
-            for (Record r : result) {
-                if (r.getValue("expenditureName") != null && r.getValue("totalAmount") != null) {
-                    String expenditureTypeName = r.getValue("expenditureName").toString();
-                    BigDecimal expenditureAmount = (BigDecimal) r.getValue("totalAmount");
-                    if (expenditureTypeName.equalsIgnoreCase("income")) {
-                        totalIncome = expenditureAmount.doubleValue();
-                    } else if (expenditureTypeName.equalsIgnoreCase("expense")) {
-                        totalExpense = expenditureAmount.doubleValue();
-                    }
+        for (Record r : result) {
+            if (r.getValue("expenditureName") != null && r.getValue("totalAmount") != null) {
+                String expenditureTypeName = r.getValue("expenditureName").toString();
+                BigDecimal expenditureAmount = (BigDecimal) r.getValue("totalAmount");
+                if (expenditureTypeName.equalsIgnoreCase("income")) {
+                    totalIncome = expenditureAmount.doubleValue();
+                } else if (expenditureTypeName.equalsIgnoreCase("expense")) {
+                    totalExpense = expenditureAmount.doubleValue();
                 }
-
             }
         }
         List<Double> expenditureList = new ArrayList<>();
@@ -142,7 +139,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 );
         if (limit != Integer.MAX_VALUE) {
             return selectQuery
-                    .orderBy(EXPENDITURE.EXPENDITURE_NUMBER.desc())
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
                     .limit(limit)
                     .fetchInto(ExpenditureItem.class);
         } else {
@@ -181,7 +178,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
         }
 
-        if (expenditureCategories != null && expenditureCategories.size() > 0) {
+        if (expenditureCategories != null && expenditureCategories.isEmpty()) {
             condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
         }
         return condition;

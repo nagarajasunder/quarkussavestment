@@ -10,6 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+import static com.geekydroid.savestmentbackend.utils.Constants.USER_ID_HEADER_PARAM_KEY;
+
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/expenditurecategory")
@@ -23,7 +25,7 @@ public class ExpenditureCategoryResource {
     public Response createNewExpenditureCategory(
             @PathParam("expenditure_type") String expenditureType,
             @PathParam("category_name") String categoryName,
-            @HeaderParam("user_id") String userId
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
     ) {
         if (expenditureType == null || categoryName == null || expenditureType.isEmpty() || categoryName.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Expenditure type or Category Name cannot be empty").build();
@@ -33,7 +35,7 @@ public class ExpenditureCategoryResource {
     }
 
     @GET()
-    public List<ExpenditureCategoryResponse> getExpenditureCategories(@HeaderParam("user_id") String userId) {
+    public List<ExpenditureCategoryResponse> getExpenditureCategories(@HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
         return service.getExpenditureCategoryResponse(userId);
     }
 
