@@ -19,7 +19,4 @@ public class ExpenditureRequest {
     private Double amount;
     private Paymode paymode;
     private String notes;
-    private String createdBy;
-
-
 }

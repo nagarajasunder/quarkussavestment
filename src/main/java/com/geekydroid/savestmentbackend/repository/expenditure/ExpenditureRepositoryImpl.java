@@ -63,9 +63,9 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     }
 
     @Override
-    public List<Double> getTotalExpenseAndIncomeAmount(LocalDate startDate, LocalDate endDate) {
+    public List<Double> getTotalExpenseAndIncomeAmount(String userId,LocalDate startDate, LocalDate endDate) {
 
-        Condition dateFilter = EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate);
+        Condition dateFilter = EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate).and(EXPENDITURE.CREATED_BY.eq(userId));
 
         Result<Record2<BigDecimal, String>> result = context
                 .select(
@@ -90,24 +90,20 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
          * 2. Income
          * So the size should be at least 2
          */
-        if ((long) result.size() >= 2L) {
-            for (Record r : result) {
-                if (r.getValue("expenditureName") != null && r.getValue("totalAmount") != null) {
-                    String expenditureTypeName = r.getValue("expenditureName").toString();
-                    BigDecimal expenditureAmount = (BigDecimal) r.getValue("totalAmount");
-                    if (expenditureTypeName.equalsIgnoreCase("income")) {
-                        totalIncome = expenditureAmount.doubleValue();
-                    } else if (expenditureTypeName.equalsIgnoreCase("expense")) {
-                        totalExpense = expenditureAmount.doubleValue();
-                    }
+        for (Record r : result) {
+            if (r.getValue("expenditureName") != null && r.getValue("totalAmount") != null) {
+                String expenditureTypeName = r.getValue("expenditureName").toString();
+                BigDecimal expenditureAmount = (BigDecimal) r.getValue("totalAmount");
+                if (expenditureTypeName.equalsIgnoreCase("income")) {
+                    totalIncome = expenditureAmount.doubleValue();
+                } else if (expenditureTypeName.equalsIgnoreCase("expense")) {
+                    totalExpense = expenditureAmount.doubleValue();
                 }
-
             }
         }
         List<Double> expenditureList = new ArrayList<>();
         expenditureList.add(0, totalExpense);
         expenditureList.add(1, totalIncome);
-        System.out.println(expenditureList);
         return expenditureList;
     }
 
@@ -118,13 +114,14 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             List<Paymode> paymode,
             LocalDate fromDate,
             LocalDate toDate,
-            List<String> expenditureCategories
+            String userId,
+            List<String> expenditureCategories,
+            int limit
     ) {
 
 
-        Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, expenditureCategories);
-
-        return context.select(
+        Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, userId,expenditureCategories);
+        SelectConditionStep<Record7<String, LocalDate, String, String, String, BigDecimal, Paymode>> selectQuery = context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
                         EXPENDITURE.DATE_OF_EXPENDITURE.as("expenditureDate"),
                         EXPENDITURE.EXPENDITURE_DESCRIPTION.as("expenditureDescription"),
@@ -139,12 +136,33 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 .on(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID))
                 .where(
                         condition
-                )
-                .fetchInto(ExpenditureItem.class);
+                );
+        if (limit != Integer.MAX_VALUE) {
+            return selectQuery
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
+                    .limit(limit)
+                    .fetchInto(ExpenditureItem.class);
+        } else {
+            return selectQuery.fetchInto(ExpenditureItem.class);
+        }
     }
 
-    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, List<String> expenditureCategories) {
+    @Override
+    public List<String> getExpenditureNumberFromCategoryName(List<String> categoryName) {
+        return context.select(EXPENDITURE.EXPENDITURE_NUMBER)
+                .from(EXPENDITURE)
+                .leftJoin(EXPENDITURE_CATEGORY)
+                .on(EXPENDITURE.EXPENDITURE_CATEGORY_EXPENDITURE_CATEGORY_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID))
+                .where(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(categoryName))
+                .fetchInto(String.class);
+    }
+
+    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, String userId,List<String> expenditureCategories) {
         Condition condition = noCondition();
+
+        if (userId != null && !userId.isEmpty()) {
+            condition = condition.and(EXPENDITURE.CREATED_BY.eq(userId));
+        }
 
         if (expenditureType != null && !expenditureType.isEmpty()) {
             condition = condition.and(EXPENDITURE_TYPE.EXPENDITURE_NAME.equalIgnoreCase(expenditureType));
@@ -160,14 +178,14 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
         }
 
-        if (expenditureCategories != null && expenditureCategories.size() > 0) {
+        if (expenditureCategories != null && expenditureCategories.isEmpty()) {
             condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
         }
         return condition;
     }
 
     @Override
-    public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(LocalDate startDate, LocalDate endDate) {
+    public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(String userId,LocalDate startDate, LocalDate endDate) {
 
 
         return context.select(
@@ -184,7 +202,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         ).on(
                 EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID.eq(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID).and(EXPENDITURE_TYPE.EXPENDITURE_NAME.eq("Expense"))
         ).where(
-                EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate)
+                EXPENDITURE.CREATED_BY.eq(userId).and(EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate))
         ).groupBy(
                 EXPENDITURE_CATEGORY.CATEGORY_NAME
         ).fetchInto(CategoryWiseExpense.class);

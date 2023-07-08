@@ -10,12 +10,19 @@ public class PaymodeConverters {
         return Converter.of(
                 Integer.class,
                 Paymode.class,
-                (Function1<Integer, Paymode>) integer -> switch (integer) {
-                    case 0 -> Paymode.CASH;
-                    case 1 -> Paymode.CARD;
-                    case 2 -> Paymode.UPI;
-                    case 3 -> Paymode.OTHER;
-                    default -> null;
+                (Function1<Integer, Paymode>) integer -> {
+                    if (integer == null) {
+                        return null;
+                    }
+                    else {
+                        return switch (integer) {
+                            case 0 -> Paymode.CASH;
+                            case 1 -> Paymode.CARD;
+                            case 2 -> Paymode.UPI;
+                            case 3 -> Paymode.OTHER;
+                            default -> null;
+                        };
+                    }
                 },
                 (Function1<Paymode, Integer>) paymode -> switch (paymode) {
                     case CASH -> 0;

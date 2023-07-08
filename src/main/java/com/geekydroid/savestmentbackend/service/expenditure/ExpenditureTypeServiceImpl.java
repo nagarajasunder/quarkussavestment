@@ -1,6 +1,5 @@
 package com.geekydroid.savestmentbackend.service.expenditure;
 
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureRequest;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureType;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureTypeRequest;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureTypeRepository;

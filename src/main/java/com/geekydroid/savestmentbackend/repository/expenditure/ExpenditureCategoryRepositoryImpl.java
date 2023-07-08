@@ -6,13 +6,14 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Result;
+import org.jooq.impl.SQLDataType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.geekydroid.savestment.domain.db.Tables.EXPENDITURE_CATEGORY;
@@ -34,13 +35,15 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
 
     @Override
     public void createNewExpenditureCategory(ExpenditureCategory expenditureCategory) {
-        entityManager.persist(expenditureCategory);
+        expenditureCategory.persist();
     }
 
     @Override
-    public List<ExpenditureCategory> getAllExpenditureCategories() {
+    public List<ExpenditureCategory> getAllExpenditureCategories(String userId) {
         return context.select()
-                .from(EXPENDITURE_CATEGORY).fetchInto(ExpenditureCategory.class);
+                .from(EXPENDITURE_CATEGORY)
+                .where(EXPENDITURE_CATEGORY.IS_COMMON.eq(true).or(EXPENDITURE_CATEGORY.CREATED_BY.eq(userId)))
+                .fetchInto(ExpenditureCategory.class);
     }
 
     @Override
@@ -49,33 +52,33 @@ public class ExpenditureCategoryRepositoryImpl implements ExpenditureCategoryRep
     }
 
     @Override
-    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse() {
-        List<String> expenditureTypeNames = context
-                .select(EXPENDITURE_TYPE.EXPENDITURE_NAME)
-                .from(EXPENDITURE_TYPE)
-                .fetchInto(String.class);
-        HashMap<String, ExpenditureCategoryResponse> expenditureCategoryMap = new HashMap<>();
+    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse(String userId) {
 
-        for (String expenditureTypeName : expenditureTypeNames) {
-            expenditureCategoryMap.put(expenditureTypeName, new ExpenditureCategoryResponse(expenditureTypeName, new ArrayList<>()));
-        }
-
+        List<ExpenditureCategoryResponse> response = new ArrayList<>();
 
         Result<Record2<String, String>> expenditureCategories = context.select(
-                EXPENDITURE_TYPE.EXPENDITURE_NAME,
-                        EXPENDITURE_CATEGORY.CATEGORY_NAME)
+                        EXPENDITURE_TYPE.EXPENDITURE_NAME,
+                        field("string_agg(DISTINCT CATEGORY_NAME::text,',')", SQLDataType.VARCHAR).as(EXPENDITURE_CATEGORY.CATEGORY_NAME)
+                )
                 .from(EXPENDITURE_TYPE)
                 .join(EXPENDITURE_CATEGORY)
-                .on(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID)).fetch();
+                .on(EXPENDITURE_TYPE.EXPENDITURE_TYPE_ID.eq(EXPENDITURE_CATEGORY.EXPENDITURE_TYPE_EXPENDITURE_TYPE_ID))
+                .where(EXPENDITURE_CATEGORY.IS_COMMON.eq(true).or(EXPENDITURE_CATEGORY.CREATED_BY.eq(userId)))
+                .groupBy(EXPENDITURE_TYPE.EXPENDITURE_NAME)
+                .fetch();
 
         for (Record r : expenditureCategories) {
             String expenditureTypeName = r.getValue(EXPENDITURE_TYPE.EXPENDITURE_NAME);
-            String expenditureCategoryName = r.getValue(EXPENDITURE_CATEGORY.CATEGORY_NAME);
-            ExpenditureCategoryResponse response = expenditureCategoryMap.get(expenditureTypeName);
-            response.addExpenditureCategory(expenditureCategoryName);
+            List<String> expenditureCategoryList = Arrays.stream(r.getValue(EXPENDITURE_CATEGORY.CATEGORY_NAME).split(",")).toList();
+            response.add(new ExpenditureCategoryResponse(expenditureTypeName, expenditureCategoryList));
         }
 
-        return expenditureCategoryMap.values().stream().toList();
+        return response;
+    }
+
+    @Override
+    public void deleteExpenditureCategoryByName(List<String> categoryName) {
+        ExpenditureCategory.deleteExpenditureCategoryByName(categoryName);
     }
 
 }

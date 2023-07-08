@@ -5,6 +5,8 @@ import com.geekydroid.savestmentbackend.domain.enums.TradeType;
 import com.geekydroid.savestmentbackend.domain.investment.*;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record11;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.SQLDataType;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,9 +17,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
-import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_ITEMS;
-import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_TYPES;
+import static com.geekydroid.savestment.domain.db.Tables.*;
 import static org.jooq.impl.DSL.*;
 
 @ApplicationScoped
@@ -40,7 +42,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             throw new NotFoundException("Equity with equity number " + equityNumber + " does not exist");
         }
         LocalDateTime now = LocalDateTime.now();
-        entity.setInvestmentTypes(investmentType);
+        entity.setInvestmentType(investmentType);
         entity.setSymbol(equityItem.getSymbol());
         entity.setUnits(equityItem.getQuantity());
         entity.setPrice(equityItem.getPrice());
@@ -72,9 +74,9 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
     }
 
     @Override
-    public List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate) {
+    public List<InvestmentTypeOverview> getTotalInvestmentItemsByTypeGivenDateRange(LocalDate startDate, LocalDate endDate,String userId) {
 
-        Condition dateFilter = INVESTMENT_ITEMS.TRADE_DATE.between(startDate, endDate);
+        Condition dateFilter = INVESTMENT_ITEMS.CREATED_BY.eq(userId).and(INVESTMENT_ITEMS.TRADE_DATE.between(startDate, endDate));
 
         List<InvestmentTypeOverview> result = context
                 .select(
@@ -105,12 +107,14 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             String equityId,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> investmentCategories,
-            String tradeType
+            String tradeType,
+            int limit
     ) {
-        Condition condition = chainFilters(equityId, fromDate, toDate, investmentCategories, tradeType);
+        Condition condition = chainFilters(equityId, fromDate, toDate, userId,investmentCategories, tradeType);
 
-        return context.select(
+        SelectConditionStep<Record11<String, String, String, LocalDate, String, BigDecimal, BigDecimal, BigDecimal, String, String, String>> selectedQuery = context.select(
                         INVESTMENT_ITEMS.INVESTMENT_ID.as("investment_number"),
                         INVESTMENT_TYPES.INVESTMENT_NAME.as("investment_type"),
                         INVESTMENT_ITEMS.SYMBOL.as("symbol"),
@@ -126,8 +130,17 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 .from(INVESTMENT_ITEMS)
                 .leftJoin(INVESTMENT_TYPES)
                 .on(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID.eq(INVESTMENT_TYPES.INVESTMENT_TYPE_ID))
-                .where(condition)
-                .fetchInto(EquityItem.class);
+                .where(condition);
+
+        if (limit != Integer.MAX_VALUE) {
+            return selectedQuery
+                    .orderBy(INVESTMENT_ITEMS.INVESTMENT_ID.desc())
+                    .limit(limit)
+                    .fetchInto(EquityItem.class);
+        } else {
+            return selectedQuery
+                    .fetchInto(EquityItem.class);
+        }
     }
 
 
@@ -135,10 +148,15 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             String equityId,
             LocalDate fromDate,
             LocalDate toDate,
+            String userId,
             List<String> investmentCategories,
             String tradeType
     ) {
         Condition condition = noCondition();
+
+        if (userId != null && !userId.isEmpty()) {
+            condition = condition.and(INVESTMENT_ITEMS.CREATED_BY.eq(userId));
+        }
 
         if (equityId != null && !equityId.isEmpty()) {
             condition = condition.and(INVESTMENT_ITEMS.INVESTMENT_ID.eq(equityId));
