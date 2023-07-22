@@ -39,10 +39,10 @@ public class HomeServiceImpl implements HomeService {
 
         List<CategoryWiseExpense> categoryWiseExpenses = expenditureRepository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate, endLocalDate);
 
-        Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
+        Double balanceAmount = totalExpenditures.get(1) - totalExpenditures.get(0);
 
         ExpenditureOverview expenditureOverview = new ExpenditureOverview(
-                totalExpenditure,
+                balanceAmount,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
                 categoryWiseExpenses,

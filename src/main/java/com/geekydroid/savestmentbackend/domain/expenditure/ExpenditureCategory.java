@@ -41,10 +41,6 @@ public class ExpenditureCategory extends PanacheEntityBase {
     @JoinColumn(name = "expenditure_type_expenditure_type_id")
     private ExpenditureType expenditureType;
 
-    @OneToMany(mappedBy = "expenditureCategory")
-    private List<Expenditure> expenditures;
-
-
     @Column(name = "category_name")
     private String categoryName;
 

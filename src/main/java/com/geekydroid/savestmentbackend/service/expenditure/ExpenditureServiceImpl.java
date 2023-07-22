@@ -52,6 +52,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
+    @Transactional
     public NetworkResponse updateExpenditure(String expNumber, ExpenditureRequest expenditureRequest) {
         Expenditure expenditure = repository.getExpenditureByExpNumber(expNumber);
         if (expenditure == null) {
