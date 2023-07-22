@@ -113,10 +113,10 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(userId,startDate, endDate,5);
         List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
 
-        Double totalExpenditure = totalExpenditures.get(0) + totalExpenditures.get(1);
+        Double balanceAmount = totalExpenditures.get(1) - totalExpenditures.get(0);
 
         return new ExpenditureOverview(
-                totalExpenditure,
+                balanceAmount,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
                 categoryWiseExpenses,

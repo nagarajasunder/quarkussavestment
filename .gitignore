@@ -42,3 +42,6 @@ nb-configuration.xml
 #Docker
 Dockerfile
 docker-compose.yml
+
+#utils
+src/main/testingutils/
