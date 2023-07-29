@@ -1,7 +1,6 @@
 package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +16,7 @@ import java.util.List;
 public class ExpenditureOverview {
 
 
-    private Double totalExpenditure;
+    private Double balance;
 
     private Double totalExpense;
 
@@ -30,7 +29,7 @@ public class ExpenditureOverview {
     @Override
     public String toString() {
         return "ExpenditureOverview{" +
-                "totalExpenditure=" + totalExpenditure +
+                "totalExpenditure=" + balance +
                 ", totalExpense=" + totalExpense +
                 ", totalIncome=" + totalIncome +
                 ", recentExpenditures=" + recentExpenditures +

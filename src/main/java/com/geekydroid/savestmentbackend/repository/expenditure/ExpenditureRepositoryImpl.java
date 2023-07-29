@@ -40,6 +40,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     }
 
     @Override
+    @Transactional
     public Expenditure updateExpenditure(String expNumber, Expenditure expenditure) {
         return entityManager.merge(expenditure);
 
