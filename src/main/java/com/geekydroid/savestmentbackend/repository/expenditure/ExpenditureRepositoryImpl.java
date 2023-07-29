@@ -190,10 +190,12 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     @Override
     public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(String userId,LocalDate startDate, LocalDate endDate) {
 
+        Field<BigDecimal> totalExpenditure = DSL.sum(EXPENDITURE.EXPENDITURE_AMOUNT).as("total_expenditure");
+
 
         return context.select(
                 EXPENDITURE_CATEGORY.CATEGORY_NAME,
-                sum(EXPENDITURE.EXPENDITURE_AMOUNT)
+                totalExpenditure
         ).from(
                 EXPENDITURE
         ).leftJoin(
@@ -208,6 +210,6 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 EXPENDITURE.CREATED_BY.eq(userId).and(EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate))
         ).groupBy(
                 EXPENDITURE_CATEGORY.CATEGORY_NAME
-        ).fetchInto(CategoryWiseExpense.class);
+        ).orderBy(totalExpenditure.desc()).fetchInto(CategoryWiseExpense.class);
     }
 }
