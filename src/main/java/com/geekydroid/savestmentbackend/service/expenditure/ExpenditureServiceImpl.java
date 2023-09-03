@@ -5,6 +5,7 @@ import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.ExpenditureExcelGenerator;
+import com.geekydroid.savestmentbackend.utils.ExpenditurePdfGenerator;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
@@ -243,17 +244,18 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 Integer.MAX_VALUE
         );
 
-        ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();
-        return generator.createExcel(expenditureItems);
+        //ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();
+        ExpenditurePdfGenerator generator = new ExpenditurePdfGenerator();
+        return generator.createPdf(startLocalDate,endLocalDate,expenditureItems);
 
     }
 
     @Override
     @Transactional
     public void deleteExpenditureByCategoryName(List<String> categoryNames) {
-        List<String> ExpenditureToBeDeleted = repository.getExpenditureNumberFromCategoryName(categoryNames);
-        if (ExpenditureToBeDeleted != null && !ExpenditureToBeDeleted.isEmpty()) {
-            Expenditure.deleteExpenditureByExpNumber(ExpenditureToBeDeleted);
+        List<String> expenditureToBeDeleted = repository.getExpenditureNumberFromCategoryName(categoryNames);
+        if (expenditureToBeDeleted != null && !expenditureToBeDeleted.isEmpty()) {
+            Expenditure.deleteExpenditureByExpNumber(expenditureToBeDeleted);
         }
         ExpenditureCategory.deleteExpenditureCategoryByName(categoryNames);
     }
