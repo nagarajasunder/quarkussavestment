@@ -119,8 +119,6 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             List<String> expenditureCategories,
             int limit
     ) {
-
-
         Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, userId,expenditureCategories);
         SelectConditionStep<Record7<String, LocalDate, String, String, String, BigDecimal, Paymode>> selectQuery = context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
@@ -181,7 +179,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
         }
 
-        if (expenditureCategories != null && expenditureCategories.isEmpty()) {
+        if (expenditureCategories != null && !expenditureCategories.isEmpty()) {
             condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
         }
         return condition;
