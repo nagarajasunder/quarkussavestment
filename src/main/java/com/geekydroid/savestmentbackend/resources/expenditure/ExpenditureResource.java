@@ -96,6 +96,7 @@ public class ExpenditureResource {
 
     @POST()
     @Path("/exportData")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response exportData(
             ExpenditureFilterRequest request,
             @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId

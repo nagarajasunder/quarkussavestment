@@ -45,8 +45,7 @@ public class HomeServiceImpl implements HomeService {
                 balanceAmount,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
-                categoryWiseExpenses,
-                List.of()
+                categoryWiseExpenses
         );
 
         List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(startLocalDate, endLocalDate,userId);

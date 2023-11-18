@@ -4,7 +4,7 @@ import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
-import com.geekydroid.savestmentbackend.utils.ExpenditureExcelGenerator;
+import com.geekydroid.savestmentbackend.utils.ExpenditurePdfGenerator;
 import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
@@ -111,7 +111,6 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
         List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(userId,startLocalDate, endLocalDate);
-        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(userId,startDate, endDate,5);
         List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
 
         Double balanceAmount = totalExpenditures.get(1) - totalExpenditures.get(0);
@@ -120,8 +119,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 balanceAmount,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
-                categoryWiseExpenses,
-                expenditureItems
+                categoryWiseExpenses
 
         );
     }
@@ -243,17 +241,18 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 Integer.MAX_VALUE
         );
 
-        ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();
-        return generator.createExcel(expenditureItems);
+        //ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();
+        ExpenditurePdfGenerator generator = new ExpenditurePdfGenerator();
+        return generator.createPdf(startLocalDate,endLocalDate,expenditureItems);
 
     }
 
     @Override
     @Transactional
     public void deleteExpenditureByCategoryName(List<String> categoryNames) {
-        List<String> ExpenditureToBeDeleted = repository.getExpenditureNumberFromCategoryName(categoryNames);
-        if (ExpenditureToBeDeleted != null && !ExpenditureToBeDeleted.isEmpty()) {
-            Expenditure.deleteExpenditureByExpNumber(ExpenditureToBeDeleted);
+        List<String> expenditureToBeDeleted = repository.getExpenditureNumberFromCategoryName(categoryNames);
+        if (expenditureToBeDeleted != null && !expenditureToBeDeleted.isEmpty()) {
+            Expenditure.deleteExpenditureByExpNumber(expenditureToBeDeleted);
         }
         ExpenditureCategory.deleteExpenditureCategoryByName(categoryNames);
     }
