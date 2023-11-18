@@ -111,7 +111,6 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
         List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(userId,startLocalDate, endLocalDate);
-        List<ExpenditureItem> expenditureItems = getExpenditureItemsGivenDateRange(userId,startDate, endDate,5);
         List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
 
         Double balanceAmount = totalExpenditures.get(1) - totalExpenditures.get(0);
@@ -120,8 +119,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 balanceAmount,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
-                categoryWiseExpenses,
-                expenditureItems
+                categoryWiseExpenses
 
         );
     }

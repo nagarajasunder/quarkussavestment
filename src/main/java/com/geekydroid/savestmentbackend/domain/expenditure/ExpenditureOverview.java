@@ -24,7 +24,6 @@ public class ExpenditureOverview {
 
     private List<CategoryWiseExpense> categoryWiseExpenses;
 
-    private List<ExpenditureItem> recentExpenditures;
 
     @Override
     public String toString() {
@@ -32,7 +31,6 @@ public class ExpenditureOverview {
                 "totalExpenditure=" + balance +
                 ", totalExpense=" + totalExpense +
                 ", totalIncome=" + totalIncome +
-                ", recentExpenditures=" + recentExpenditures +
                 '}';
     }
 }
