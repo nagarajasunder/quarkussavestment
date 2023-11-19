@@ -117,7 +117,8 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             LocalDate toDate,
             String userId,
             List<String> expenditureCategories,
-            int limit
+            int pageNo,
+            int itemsPerPage
     ) {
         Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, userId,expenditureCategories);
         SelectConditionStep<Record7<String, LocalDate, String, String, String, BigDecimal, Paymode>> selectQuery = context.select(
@@ -136,14 +137,17 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 .where(
                         condition
                 );
-        if (limit != Integer.MAX_VALUE) {
+
+        if (pageNo > 0 && itemsPerPage > 0) {
+            int offset = ((pageNo - 1) * itemsPerPage);
             return selectQuery
-                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
-                    .limit(limit)
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc(),EXPENDITURE.EXPENDITURE_NUMBER.asc())
+                    .limit(itemsPerPage)
+                    .offset(offset)
                     .fetchInto(ExpenditureItem.class);
         } else {
             return selectQuery
-                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc(),EXPENDITURE.EXPENDITURE_NUMBER.asc())
                     .fetchInto(ExpenditureItem.class);
         }
     }

@@ -16,7 +16,6 @@ import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -125,15 +124,6 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public List<ExpenditureItem> getExpenditureItemsGivenDateRange(String userId,String startDate, String endDate,int limit) {
-
-        LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
-        LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
-
-        return repository.getExpenditureItemBasedOnGivenFilters(null,null,startLocalDate, endLocalDate,userId,null,limit);
-    }
-
-    @Override
     public NetworkResponse getExpenditureByExpNumber(String expNumber) {
         if (expNumber.isEmpty()) {
             return new com.geekydroid.savestmentbackend.utils.models.Error(
@@ -179,7 +169,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         }
 
         List<Paymode> paymodes = new ArrayList<>();
-        if (request.getPaymodes() != null && request.getPaymodes().size() > 0) {
+        if (request.getPaymodes() != null && !request.getPaymodes().isEmpty()) {
             paymodes = request.getPaymodes().stream().map(paymode -> Paymode.valueOf(paymode.toUpperCase())).toList();
         }
 
@@ -191,7 +181,8 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 endLocalDate,
                 userId,
                 request.getCategories(),
-                Integer.MAX_VALUE
+                request.getPageNo(),
+                request.getItemsPerPage()
         );
     }
 
@@ -213,7 +204,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public File exportDataToExcel(ExpenditureFilterRequest request,String userId) throws IOException {
+    public File exportDataToExcel(ExpenditureFilterRequest request,String userId) {
 
         LocalDate startLocalDate = null;
         LocalDate endLocalDate = null;
@@ -226,7 +217,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         }
 
         List<Paymode> paymodes = new ArrayList<>();
-        if (request.getPaymodes() != null && request.getPaymodes().size() > 0) {
+        if (request.getPaymodes() != null && !request.getPaymodes().isEmpty()) {
             paymodes = request.getPaymodes().stream().map(paymode -> Paymode.valueOf(paymode.toUpperCase())).toList();
         }
 
@@ -238,7 +229,8 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 endLocalDate,
                 userId,
                 request.getCategories(),
-                Integer.MAX_VALUE
+                0,
+                0
         );
 
         //ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();

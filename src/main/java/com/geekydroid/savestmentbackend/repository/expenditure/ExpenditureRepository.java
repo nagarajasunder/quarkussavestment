@@ -31,7 +31,8 @@ public interface ExpenditureRepository {
             LocalDate toDate,
             String userId,
             List<String> expenditureCategories,
-            int limit
+            int pageNo,
+            int itemsPerPage
     );
 
     List<String> getExpenditureNumberFromCategoryName(List<String> categoryName);

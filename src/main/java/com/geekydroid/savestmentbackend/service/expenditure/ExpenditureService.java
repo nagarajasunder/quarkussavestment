@@ -24,9 +24,6 @@ public interface ExpenditureService {
 
     ExpenditureOverview getExpenditureOverview(String usesrId,String startDate,String endDate);
 
-    List<ExpenditureItem> getExpenditureItemsGivenDateRange(String userId,String startDate,String endDate,int limit);
-
-
     NetworkResponse getExpenditureByExpNumber(String expNumber);
 
     List<ExpenditureItem> getExpenditureItemBasedOnGivenFilters(
