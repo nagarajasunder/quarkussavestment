@@ -1,6 +1,7 @@
 #Maven
 target/
 pom.xml.tag
+generateProdTag.sh
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 release.properties
