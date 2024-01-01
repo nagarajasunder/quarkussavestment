@@ -105,6 +105,10 @@
       <artifactId>poi</artifactId>
       <version>5.2.3</version>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-flyway</artifactId>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
     <dependency>
       <groupId>com.itextpdf</groupId>

@@ -1,5 +1,6 @@
 package com.geekydroid.savestmentbackend.utils;
 
+import com.geekydroid.savestmentbackend.domain.expenditure.CategoryRespnose;
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -12,12 +13,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class InvestmentExcelGenerator {
 
     int serialNumber = 1;
 
-    public File createExcel(List<String> investmentTypes, List<EquityItem> equityItems) throws IOException {
+    public File createExcel(List<CategoryRespnose> investmentTypes, List<EquityItem> equityItems) throws IOException {
 
         try (HSSFWorkbook workbook = createWorkBook(investmentTypes, equityItems)) {
             File exportFile = new File("equityData.xls");
@@ -27,7 +29,7 @@ public class InvestmentExcelGenerator {
         }
     }
 
-    private HSSFWorkbook createWorkBook(List<String> investmentTypes, List<EquityItem> equityItems) {
+    private HSSFWorkbook createWorkBook(List<CategoryRespnose> investmentTypes, List<EquityItem> equityItems) {
         HSSFWorkbook workbook = new HSSFWorkbook();
         Map<String, List<EquityItem>> equityItemMap = groupInvestmentsByTypes(investmentTypes, equityItems);
         List<String> sheetHeaders = List.of("S.No","Symbol","Trade Date","Trade Type","Units","Price","Amount Invested");
@@ -73,14 +75,14 @@ public class InvestmentExcelGenerator {
         }
     }
 
-    private Map<String, List<EquityItem>> groupInvestmentsByTypes(List<String> investmentTypes, List<EquityItem> equityItems) {
+    private Map<String, List<EquityItem>> groupInvestmentsByTypes(List<CategoryRespnose> investmentTypes, List<EquityItem> equityItems) {
 
         Map<String, List<EquityItem>> equityItemMap = new HashMap<>();
 
-        for (String investmentType : investmentTypes) {
+        for (CategoryRespnose investmentType : investmentTypes) {
             List<EquityItem> filteredEquityItems = equityItems.stream().filter(
-                    equityItem -> equityItem.getInvestmentType().equalsIgnoreCase(investmentType)).toList();
-            equityItemMap.put(investmentType, filteredEquityItems);
+                    equityItem -> Objects.equals(equityItem.getInvestmentTypeId(), investmentType.getId())).toList();
+            equityItemMap.put(investmentType.getName(), filteredEquityItems);
         }
 
         return equityItemMap;

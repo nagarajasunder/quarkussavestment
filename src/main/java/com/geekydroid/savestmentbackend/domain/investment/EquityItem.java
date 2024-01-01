@@ -16,8 +16,8 @@ import java.util.UUID;
 public class EquityItem {
 
     private String investmentNumber;
+    private Long investmentTypeId;
     private String investmentType;
-
     private String symbol;
 
     private LocalDate tradeDate;
@@ -29,7 +29,7 @@ public class EquityItem {
     private Double price;
     private Double amountInvested;
 
-    private UUID createdBy;
+    private String createdBy;
 
     private String createdOn;
 
@@ -39,7 +39,7 @@ public class EquityItem {
     @Override
     public String toString() {
         return "EquityItem{" +
-                "investmentType='" + investmentType + '\'' +
+                "investmentType='" + investmentTypeId + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", tradeDate=" + tradeDate +
                 ", tradeType=" + tradeType +

@@ -1,35 +1,25 @@
 package com.geekydroid.savestmentbackend.domain.investment;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "INVESTMENT_TYPES")
 @Entity
-public class InvestmentType extends PanacheEntityBase {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class InvestmentType {
 
-    public InvestmentType() {
-    }
-
-    public InvestmentType(Long investmentTypeId, String investmentName, LocalDateTime createdOn, LocalDateTime updatedOn) {
-        this.investmentTypeId = investmentTypeId;
-        this.investmentName = investmentName;
-        this.createdOn = createdOn;
-        this.updatedOn = updatedOn;
-    }
-
-    @SequenceGenerator(
-            name = "investment_id_generator",
-            sequenceName = "investment_id_generator",
-            initialValue = 10,
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            generator = "investment_id_generator",
-            strategy = GenerationType.IDENTITY
-    )
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "INVESTMENT_TYPE_ID")
     private Long investmentTypeId;
 
@@ -37,42 +27,34 @@ public class InvestmentType extends PanacheEntityBase {
     @Column(name = "INVESTMENT_NAME")
     private String investmentName;
 
+    @Column(name = "CREATED_BY")
+    private String createdBy;
+
     @Column(name = "CREATED_ON")
     private LocalDateTime createdOn;
 
     @Column(name = "UPDATED_ON")
     private LocalDateTime updatedOn;
 
+    @OneToMany(mappedBy = "investmentType")
+    private List<InvestmentItem> investments;
 
-    public Long getInvestmentTypeId() {
-        return investmentTypeId;
-    }
+    @Column(name= "IS_COMMON")
+    private boolean isCommon;
 
-    public void setInvestmentTypeId(Long investmentTypeId) {
-        this.investmentTypeId = investmentTypeId;
-    }
-
-    public String getInvestmentName() {
-        return investmentName;
-    }
-
-    public void setInvestmentName(String investmentName) {
+    public InvestmentType(
+            String investmentName,
+            Boolean isCommon,
+            String createdBy,
+            LocalDateTime createdOn,
+            LocalDateTime updatedOn
+    ) {
         this.investmentName = investmentName;
-    }
-
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDateTime createdOn) {
+        this.isCommon = isCommon;
+        this.createdBy = createdBy;
         this.createdOn = createdOn;
-    }
-
-    public LocalDateTime getUpdatedOn() {
-        return updatedOn;
-    }
-
-    public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
+        this.investments = new ArrayList<>();
     }
+
 }

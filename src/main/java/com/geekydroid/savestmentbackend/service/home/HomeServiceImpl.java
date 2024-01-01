@@ -52,7 +52,7 @@ public class HomeServiceImpl implements HomeService {
 
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
-        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews, List.of());
+        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews);
 
         HomeScreenData homeScreenData = new HomeScreenData(expenditureOverview, investmentOverview);
 

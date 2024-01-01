@@ -2,10 +2,11 @@ package com.geekydroid.savestmentbackend.service.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import com.geekydroid.savestmentbackend.domain.expenditure.*;
+import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureCategoryRepository;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
+import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.ExpenditurePdfGenerator;
-import com.geekydroid.savestmentbackend.utils.models.Exception;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.Success;
@@ -13,6 +14,7 @@ import com.geekydroid.savestmentbackend.utils.models.Success;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -30,87 +32,125 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     @Inject
     ExpenditureCategoryService expenditureCategoryService;
 
+    @Inject
+    ExpenditureTypeRepository expenditureTypeRepository;
+
+    @Inject
+    ExpenditureCategoryRepository expenditureCategoryRepository;
+
     @Override
-    public NetworkResponse createExpenditure(String userId,ExpenditureRequest expenditureRequest, ExpenditureCategory expenditureCategory) {
+    public ExpenditureResponse create(ExpenditureRequest request) {
+
+        if (
+                request.getAmount() == null ||
+                        request.getExpenditureDate() == null ||
+                        request.getExpenditureDate().isEmpty() ||
+                        request.getExpenditureCategoryId() == null
+        ) {
+            throw new BadRequestException("Invalid request");
+        }
+
+        ExpenditureCategory category = expenditureCategoryRepository.getById(request.getExpenditureCategoryId());
+        if (category == null) {
+            throw new BadRequestException("Expenditure category doesn't exist");
+        }
+
         LocalDateTime now = LocalDateTime.now();
         Expenditure newExpenditure = new Expenditure(
-                expenditureCategory,
-                expenditureRequest.getAmount(),
-                expenditureRequest.getNotes(),
-                expenditureRequest.getPaymode(),
-                DateUtils.fromStringToLocalDate(expenditureRequest.getExpenditureDate()),
-                userId,
+                category,
+                request.getAmount(),
+                request.getNotes(),
+                request.getPaymode(),
+                DateUtils.fromStringToLocalDate(request.getExpenditureDate()),
+                request.getCreatedBy(),
                 now,
                 now
         );
-        Expenditure expenditure = repository.createExpenditure(newExpenditure);
-        if (expenditure != null) {
-            return new Success(Response.Status.CREATED, null, expenditureRequest);
-        }
-        return null;
+        Expenditure expenditure = repository.create(newExpenditure);
+        return new ExpenditureResponse(
+                expenditure.getExpenditureNumber(),
+                expenditure.getExpenditureCategory().getExpenditureCategoryId(),
+                expenditure.getExpenditureAmount(),
+                expenditure.getExpenditureDescription(),
+                expenditure.getPaymode().name(),
+                expenditure.getExpenditureDate()
+        );
     }
 
     @Override
     @Transactional
-    public NetworkResponse updateExpenditure(String expNumber, ExpenditureRequest expenditureRequest) {
-        Expenditure expenditure = repository.getExpenditureByExpNumber(expNumber);
+    public ExpenditureResponse update(ExpenditureRequest request) {
+        if (
+                request.getExpenditureNumber() == null ||
+                        request.getExpenditureNumber().isEmpty() ||
+                        request.getExpenditureCategoryId() == null ||
+                        request.getAmount() == null ||
+                        request.getPaymode() == null ||
+                        request.getExpenditureDate() == null
+        ) {
+            throw new BadRequestException("Invalid request");
+        }
+        Expenditure expenditure = repository.getExpenditureByExpNumber(request.getExpenditureNumber());
         if (expenditure == null) {
-            return new Exception(Response.Status.BAD_REQUEST, new java.lang.Exception("The given expenditure number " + expNumber + " doesn't exist"), null);
+           throw new BadRequestException("The given expenditure number " + request.getExpenditureNumber() + " doesn't exist");
         }
-        if (expenditureRequest.getAmount() != null) {
-            expenditure.setExpenditureAmount(expenditureRequest.getAmount());
+
+        ExpenditureCategory category = expenditureCategoryRepository.getById(request.getExpenditureCategoryId());
+
+        if (category == null) {
+            throw new BadRequestException("Invalid category");
         }
-        if (expenditureRequest.getExpenditureDate() != null) {
-            expenditure.setExpenditureDate(DateUtils.fromStringToLocalDate(expenditureRequest.getExpenditureDate()));
-        }
-        if (expenditureRequest.getExpenditureCategory() != null && !expenditureRequest.getExpenditureCategory().isEmpty()) {
-            ExpenditureCategory category = expenditureCategoryService.getExpenditureCategoryByName(expenditureRequest.getExpenditureCategory());
-            if (category != null) {
-                expenditure.setExpenditureCategory(category);
-            } else {
-                return new Exception(Response.Status.BAD_REQUEST, new java.lang.Exception("Invalid expenditure category"), null);
-            }
-        }
-        if (expenditureRequest.getNotes() != null) {
-            expenditure.setExpenditureDescription(expenditureRequest.getNotes());
-        }
-        if (expenditureRequest.getPaymode() != null) {
-            expenditure.setPaymode(expenditureRequest.getPaymode());
-        }
+
+        expenditure.setExpenditureAmount(request.getAmount());
+        expenditure.setExpenditureDate(DateUtils.fromStringToLocalDate(request.getExpenditureDate()));
+        expenditure.setExpenditureCategory(category);
+        expenditure.setExpenditureDescription(request.getNotes());
+        expenditure.setPaymode(request.getPaymode());
         expenditure.setUpdatedOn(LocalDateTime.now());
-        Expenditure updatedExpenditure = repository.updateExpenditure(expNumber, expenditure);
-        if (updatedExpenditure != null) {
-            return new Success(Response.Status.OK, null, updatedExpenditure);
-        }
-        return new Success(Response.Status.INTERNAL_SERVER_ERROR, null, null);
-    }
-
-    @Override
-    public NetworkResponse deleteExpenditure(String expNumber) {
-        Expenditure expenditure = repository.deleteExpenditure(expNumber);
-        if (expenditure != null) {
-            GenericNetworkResponse response = new GenericNetworkResponse();
-            response.setStatus("SUCCESS");
-            response.setMessage("Expenditure Deleted Successfully");
-            response.setStatusCode(Response.Status.OK.getStatusCode());
-            return new Success(Response.Status.OK, null, response);
-        }
-        return new com.geekydroid.savestmentbackend.utils.models.Exception(
-                Response.Status.BAD_REQUEST,
-                new java.lang.Exception("The expenditure with expenditure number " + expNumber + " does not exist"),
-                null
+        Expenditure updatedExpenditure = repository.update(expenditure);
+        return new ExpenditureResponse(
+                updatedExpenditure.getExpenditureNumber(),
+                updatedExpenditure.getExpenditureCategory().getExpenditureCategoryId(),
+                updatedExpenditure.getExpenditureAmount(),
+                updatedExpenditure.getExpenditureDescription(),
+                updatedExpenditure.getPaymode().name(),
+                updatedExpenditure.getExpenditureDate()
         );
-
     }
 
     @Override
-    public ExpenditureOverview getExpenditureOverview(String userId,String startDate, String endDate) {
+    public ExpenditureResponse delete(String expNumber) {
+
+        if (expNumber == null) {
+            throw new BadRequestException("Invalid request");
+        }
+
+        Expenditure expenditure = repository.getExpenditureByExpNumber(expNumber);
+
+        if (expenditure == null) {
+            throw new BadRequestException("Expenditure doesn't exist");
+        }
+
+        repository.delete(expenditure);
+
+        return new ExpenditureResponse(
+                expenditure.getExpenditureNumber(),
+                expenditure.getExpenditureCategory().getExpenditureCategoryId(),
+                expenditure.getExpenditureAmount(),
+                expenditure.getExpenditureDescription(),
+                expenditure.getPaymode().name(),
+                expenditure.getExpenditureDate()
+        );
+    }
+
+    @Override
+    public ExpenditureOverview getExpenditureOverview(String userId, String startDate, String endDate) {
 
         LocalDate startLocalDate = DateUtils.fromStringToLocalDate(startDate);
         LocalDate endLocalDate = DateUtils.fromStringToLocalDate(endDate);
 
-        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(userId,startLocalDate, endLocalDate);
-        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
+        List<Double> totalExpenditures = repository.getTotalExpenseAndIncomeAmount(userId, startLocalDate, endLocalDate);
+        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId, startLocalDate, endLocalDate);
 
         Double balanceAmount = totalExpenditures.get(1) - totalExpenditures.get(0);
 
@@ -145,6 +185,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
                 expenditure.getExpenditureDate(),
                 expenditure.getExpenditureDescription(),
                 expenditure.getExpenditureCategory().getCategoryName(),
+                expenditure.getExpenditureCategory().getExpenditureCategoryId(),
                 expenditure.getExpenditureCategory().getExpenditureType().getExpenditureName(),
                 expenditure.getExpenditureAmount(),
                 expenditure.getPaymode()
@@ -187,7 +228,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
     }
 
     @Override
-    public NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate,String userId) {
+    public NetworkResponse getCategoryWiseExpenseByGivenDateRange(String startDate, String endDate, String userId) {
         LocalDate startLocalDate = null;
         LocalDate endLocalDate = null;
         if (startDate != null && !startDate.isEmpty()) {
@@ -198,13 +239,13 @@ public class ExpenditureServiceImpl implements ExpenditureService {
             endLocalDate = DateUtils.fromStringToLocalDate(endDate);
         }
 
-        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId,startLocalDate,endLocalDate);
+        List<CategoryWiseExpense> categoryWiseExpenses = repository.getCategoryWiseExpenseByGivenDateRange(userId, startLocalDate, endLocalDate);
 
-        return new Success(Response.Status.OK,null,categoryWiseExpenses);
+        return new Success(Response.Status.OK, null, categoryWiseExpenses);
     }
 
     @Override
-    public File exportDataToExcel(ExpenditureFilterRequest request,String userId) {
+    public File exportDataToExcel(ExpenditureFilterRequest request, String userId) {
 
         LocalDate startLocalDate = null;
         LocalDate endLocalDate = null;
@@ -222,7 +263,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         }
 
 
-        List<ExpenditureItem> expenditureItems =  repository.getExpenditureItemBasedOnGivenFilters(
+        List<ExpenditureItem> expenditureItems = repository.getExpenditureItemBasedOnGivenFilters(
                 request.getExpenditureType(),
                 paymodes,
                 startLocalDate,
@@ -235,17 +276,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
         //ExpenditureExcelGenerator generator = new ExpenditureExcelGenerator();
         ExpenditurePdfGenerator generator = new ExpenditurePdfGenerator();
-        return generator.createPdf(startLocalDate,endLocalDate,expenditureItems);
+        return generator.createPdf(startLocalDate, endLocalDate, expenditureItems);
 
-    }
-
-    @Override
-    @Transactional
-    public void deleteExpenditureByCategoryName(List<String> categoryNames) {
-        List<String> expenditureToBeDeleted = repository.getExpenditureNumberFromCategoryName(categoryNames);
-        if (expenditureToBeDeleted != null && !expenditureToBeDeleted.isEmpty()) {
-            Expenditure.deleteExpenditureByExpNumber(expenditureToBeDeleted);
-        }
-        ExpenditureCategory.deleteExpenditureCategoryByName(categoryNames);
     }
 }

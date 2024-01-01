@@ -6,25 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
 @Getter
 @Setter
-public class InvestmentOverview {
+public class CreateInvestmentCategoryRequest {
 
-    private Double totalInvestmentAmount;
-    private List<InvestmentTypeOverview> investmentTypeOverview;
-
-
-
-    @Override
-    public String toString() {
-        return "InvestmentOverview{" +
-                "investmentTypeOverview=" + investmentTypeOverview +
-                '}';
-    }
+    private String categoryName;
+    private String createdBy;
 }
-
-
