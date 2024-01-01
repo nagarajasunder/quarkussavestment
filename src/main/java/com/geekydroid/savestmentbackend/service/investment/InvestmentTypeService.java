@@ -1,14 +1,20 @@
 package com.geekydroid.savestmentbackend.service.investment;
 
+import com.geekydroid.savestmentbackend.domain.expenditure.CategoryRespnose;
+import com.geekydroid.savestmentbackend.domain.expenditure.UpdateCategoryRequest;
+import com.geekydroid.savestmentbackend.domain.investment.CreateInvestmentCategoryRequest;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentType;
 
 import java.util.List;
 
 public interface InvestmentTypeService {
 
-    InvestmentType findInvestmentTypeByName(String investmentTypeName);
+    List<CategoryRespnose> getAllInvestmentCategories();
 
-    List<InvestmentType> getAllInvestmentTypes();
+    CategoryRespnose create(CreateInvestmentCategoryRequest request);
 
-    List<String> getAllInvestmentCategories();
+    CategoryRespnose update(UpdateCategoryRequest request);
+
+    CategoryRespnose delete(Long id);
+
 }

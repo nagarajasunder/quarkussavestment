@@ -9,11 +9,15 @@ import java.util.List;
 
 public interface InvestmentService {
 
+    EquityItem getById(String investmentNumber);
+
+    EquityItem create(EquityItem item);
+
     NetworkResponse addEquityItems(List<EquityItem> equityItems,String userId);
 
-    NetworkResponse updateEquityItems(String EquityNumber,EquityItem equityItem);
+    EquityItem update(EquityItem equityItem);
 
-    NetworkResponse deleteEquityItem(String equityNumber);
+    EquityItem delete(String equityNumber);
 
     NetworkResponse getInvestmentOverview(String startDate, String endDate,String userId);
 

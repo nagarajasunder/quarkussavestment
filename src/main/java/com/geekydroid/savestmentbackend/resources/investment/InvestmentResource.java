@@ -24,25 +24,63 @@ public class InvestmentResource {
     @Inject
     InvestmentService investmentService;
 
+    @GET
+    @Path("/{equityNumber}")
+    public Response getById(
+            @PathParam("equityNumber") String number
+    ) {
+        if (number == null || number.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
+        }
+        return Response.status(Response.Status.OK).entity(investmentService.getById(number)).build();
+    }
+
     @POST()
-    @Path("/addEquity")
+    @Path("/bulkupload")
     @Transactional
-    public Response addEquity(List<EquityItem> equityItems, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
+    public Response createBulk(List<EquityItem> equityItems, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
         return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems, userId));
     }
 
+    @POST()
+    @Path("/create")
+    public Response create(
+            EquityItem request,
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
+    ) {
+        if (request == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
+        }
+        request.setCreatedBy(userId);
+        return Response.status(Response.Status.CREATED).entity(investmentService.create(request)).build();
+    }
+
     @PUT()
-    @Path("/updateEquity/{equityNumber}")
+    @Path("/{equityNumber}/update")
     @Transactional
-    public Response updateEquity(@PathParam("equityNumber") String equityNumber, EquityItem equityItem) {
-        return ResponseUtil.getResponseFromResult(investmentService.updateEquityItems(equityNumber, equityItem));
+    public Response update(
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId,
+            @PathParam("equityNumber") String equityNumber,
+            EquityItem request
+    ) {
+        if (request == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
+        }
+        request.setCreatedBy(userId);
+        request.setInvestmentNumber(equityNumber);
+        return Response.status(Response.Status.OK).entity(investmentService.update(request)).build();
     }
 
     @DELETE()
-    @Path("/deleteEquity/{equityNumber}")
+    @Path("/{equityNumber}/delete")
     @Transactional
-    public Response deleteEquity(@PathParam("equityNumber") String equityNumber) {
-        return ResponseUtil.getResponseFromResult(investmentService.deleteEquityItem(equityNumber));
+    public Response delete(
+            @PathParam("equityNumber") String equityNumber
+    ) {
+        if (equityNumber == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
+        }
+        return Response.status(Response.Status.OK).entity(investmentService.delete(equityNumber)).build();
     }
 
     @GET()
@@ -53,7 +91,7 @@ public class InvestmentResource {
 
     @POST()
     @Path("/filterBy")
-    public Response getExpenditureBasedOnFilters(
+    public Response getInvestmentsBasedOnResults(
             InvestmentFilterRequest request,
             @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
     ) {

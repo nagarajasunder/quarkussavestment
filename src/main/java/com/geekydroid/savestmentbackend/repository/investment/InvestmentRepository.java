@@ -7,11 +7,16 @@ import java.util.List;
 
 public interface InvestmentRepository {
 
-    List<InvestmentItem> addEquity(List<InvestmentItem> investmentItems);
+    List<InvestmentItem> bulkCreate(List<InvestmentItem> investmentItems);
 
-    InvestmentItem updateEquity(String equityNumber, EquityItem equityItem, InvestmentType investmentType);
+    InvestmentItem create(InvestmentItem item);
 
-    void deleteEquity(String equityNumber);
+    InvestmentItem getById(String id);
+
+
+    InvestmentItem update(InvestmentItem investmentItem);
+
+    InvestmentItem delete(InvestmentItem investmentItem);
 
     List<InvestmentItem> getAllEquityItems();
 
@@ -26,6 +31,9 @@ public interface InvestmentRepository {
             String userId,
             List<String> investmentCategories,
             String tradeType,
-            int limit
+            int pageNo,
+            int itemsPerPage
     );
+
+    EquityItem getByNumber(String investmentNumber);
 }

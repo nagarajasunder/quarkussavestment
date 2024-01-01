@@ -14,11 +14,11 @@ import java.util.List;
 @ApplicationScoped
 public interface ExpenditureRepository {
 
-    Expenditure createExpenditure(Expenditure expenditure);
+    Expenditure create(Expenditure expenditure);
 
-    Expenditure updateExpenditure(String expNumber, Expenditure expenditure);
+    Expenditure update(Expenditure expenditure);
 
-    Expenditure deleteExpenditure(String expNumber);
+    Expenditure delete(Expenditure expenditure);
 
     Expenditure getExpenditureByExpNumber(String expNumber);
 
@@ -38,4 +38,6 @@ public interface ExpenditureRepository {
     List<String> getExpenditureNumberFromCategoryName(List<String> categoryName);
 
     List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(String userId,LocalDate startDate,LocalDate endDate);
+
+    void deleteExpendituresByCategoryId(Long categoryId);
 }

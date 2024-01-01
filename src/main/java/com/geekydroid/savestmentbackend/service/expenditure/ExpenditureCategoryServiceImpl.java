@@ -1,19 +1,14 @@
 package com.geekydroid.savestmentbackend.service.expenditure;
 
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategory;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureCategoryResponse;
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureType;
+import com.geekydroid.savestmentbackend.domain.expenditure.*;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureCategoryRepository;
-import com.geekydroid.savestmentbackend.utils.models.Exception;
-import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
-import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
-import com.geekydroid.savestmentbackend.utils.models.Success;
+import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureRepository;
+import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureTypeRepository;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,39 +20,42 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
     ExpenditureCategoryRepository repository;
 
     @Inject
+    ExpenditureTypeRepository expenditureTypeRepository;
+
+    @Inject
     ExpenditureService expenditureService;
 
+    @Inject
+    ExpenditureRepository expenditureRepository;
 
     @Override
-    public NetworkResponse createNewExpenditureCategory(String expenditureTypeName, String categoryName,String userId) {
+    public CategoryRespnose create(CreateExpenditureCategoryRequest request) {
+        if (request.getExpenditureTypeId() == null || request.getCreatedBy() == null) {
+            throw new BadRequestException("Invalid Request");
+        }
+        ExpenditureType expenditureType = expenditureTypeRepository.getById(request.getExpenditureTypeId());
+        if (expenditureType == null) {
+            throw new BadRequestException("Expenditure type doesn't exist");
+        }
+
+        ExpenditureCategory duplicate = repository.getByName(request.getExpenditureTypeId(), request.getCategoryName().toLowerCase(), request.getCreatedBy());
+        if (duplicate != null) {
+            throw new BadRequestException("Expenditure category already exists");
+        }
 
         LocalDateTime now = LocalDateTime.now();
-        String expenditureTypeQueryString = String.valueOf(expenditureTypeName.charAt(0)).toUpperCase() + expenditureTypeName.substring(1).toLowerCase();
-        ExpenditureType expenditureType = ExpenditureType.find("expenditureName", expenditureTypeQueryString).firstResult();
-        if (expenditureType == null) {
-            return new Exception(Response.Status.BAD_REQUEST, new BadRequestException("Invalid Expenditure Type " + expenditureTypeName), null);
-        }
         ExpenditureCategory newExpenditureCategory = new ExpenditureCategory(
                 expenditureType,
-                categoryName,
+                request.getCategoryName(),
                 false,
-                userId,
+                request.getCreatedBy(),
                 now,
                 now
         );
 
-        repository.createNewExpenditureCategory(newExpenditureCategory);
+        newExpenditureCategory = repository.create(newExpenditureCategory);
 
-        return new Success(Response.Status.CREATED, null, new GenericNetworkResponse(Response.Status.CREATED.getStatusCode(),
-                "success",
-                "Expenditure category created successfully",
-                null
-        ));
-    }
-
-    @Override
-    public List<ExpenditureCategory> getAllExpenditureCategories(String userId) {
-        return repository.getAllExpenditureCategories(userId);
+        return new CategoryRespnose(newExpenditureCategory.getExpenditureCategoryId(), newExpenditureCategory.getCategoryName());
     }
 
     @Override
@@ -66,43 +64,41 @@ public class ExpenditureCategoryServiceImpl implements ExpenditureCategoryServic
     }
 
     @Override
-    public List<ExpenditureCategoryResponse> getExpenditureCategoryResponse(String userId) {
-        return repository.getExpenditureCategoryResponse(userId);
+    public List<CategoryRespnose> getExpenditureCategories(Long expenditureTypeId, String userId) {
+        return repository.getExpenditureCategoryResponse(expenditureTypeId, userId);
     }
 
     @Override
-    public NetworkResponse deleteExpenditureCategories(List<String> categoryNames) {
-        try {
-            expenditureService.deleteExpenditureByCategoryName(categoryNames);
-            repository.deleteExpenditureCategoryByName(categoryNames);
-            return new Success(Response.Status.OK, null,
-                    new GenericNetworkResponse(
-                            Response.Status.OK.getStatusCode(),
-                            "Success",
-                            "Expenditure Category deleted successfully",
-                            null)
-            );
-        } catch (java.lang.Exception exception) {
-            return new Exception(Response.Status.INTERNAL_SERVER_ERROR, exception, null);
+    public CategoryRespnose delete(Long categoryId) {
+        ExpenditureCategory category = repository.getById(categoryId);
+        if (category == null) {
+            throw new  BadRequestException("Category doesn't exist");
         }
+        if (category.isCommon()) {
+            throw new  BadRequestException("Default Category cannot be deleted");
+        }
+        category.getExpenditures().forEach(expenditure -> expenditureRepository.delete(expenditure));
+        repository.delete(category);
+        return new CategoryRespnose(categoryId, category.getCategoryName());
     }
 
+
     @Override
-    public NetworkResponse updateExpenditureCategory(String existingCategory, String newValue) {
-        try {
-            LocalDateTime now = LocalDateTime.now();
-            ExpenditureCategory.update("categoryName = ?1, updatedOn = ?2 where categoryName = ?3", newValue, now ,existingCategory);
-            return new Success(
-                    Response.Status.OK,
-                    null,
-                    new GenericNetworkResponse(
-                            Response.Status.OK.getStatusCode(),
-                            "success",
-                            "Expenditure category updated successfully",
-                            null
-                    ));
-        } catch (java.lang.Exception e) {
-            return new Exception(Response.Status.INTERNAL_SERVER_ERROR, e, null);
+    public CategoryRespnose update(UpdateCategoryRequest request) {
+        if (request.getCategoryName() == null) {
+            throw new BadRequestException("Category name cannot be empty");
         }
+        ExpenditureCategory category = repository.getById(request.getCategoryId());
+        if (category == null) {
+           throw new BadRequestException("Category doesn't exists");
+        }
+        if (category.isCommon()) {
+            throw new BadRequestException("Default category cannot be edited");
+        }
+        category.setCategoryName(request.getCategoryName());
+        category.setUpdatedOn(LocalDateTime.now());
+        category = repository.update(category);
+        return new CategoryRespnose(category.getExpenditureCategoryId(),category.getCategoryName());
     }
+
 }

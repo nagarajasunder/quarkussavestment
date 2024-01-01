@@ -2,17 +2,15 @@ package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import com.geekydroid.savestmentbackend.db.ExpenditureNumberSequenceGenerator;
 import com.geekydroid.savestmentbackend.domain.enums.Paymode;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Parameters;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "EXPENDITURE")
@@ -27,7 +25,9 @@ import java.util.UUID;
 )
 @Getter
 @Setter
-public class Expenditure extends PanacheEntityBase {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Expenditure {
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
@@ -89,27 +89,6 @@ public class Expenditure extends PanacheEntityBase {
         this.createdBy = createdBy;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
-    }
-
-    public Expenditure() {
-    }
-
-    public static void deleteExpenditureByExpNumber(List<String> expNumber) {
-        delete("#Expenditure.deleteByExpNumber", expNumber);
-    }
-
-    @Override
-    public String toString() {
-        return "Expenditure{" +
-                "expenditureNumber='" + expenditureNumber + '\'' +
-                ", expenditureCategory=" + expenditureCategory +
-                ", expenditureAmount=" + expenditureAmount +
-                ", expenditureDescription='" + expenditureDescription + '\'' +
-                ", paymode=" + paymode +
-                ", expenditureDate=" + expenditureDate +
-                ", createdBy=" + createdBy +
-                ", createdOn=" + createdOn +
-                ", updatedOn=" + updatedOn +
-                '}';
+        this.expenditureCategory.getExpenditures().add(this);
     }
 }

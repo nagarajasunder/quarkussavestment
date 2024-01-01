@@ -18,6 +18,7 @@ public class ExpenditureItem {
     private LocalDate expenditureDate;
     private String expenditureDescription;
     private String expenditureCategory;
+    private Long expenditureCategoryId;
     private String expenditureType;
     private Double expenditureAmount;
     private Paymode paymode;

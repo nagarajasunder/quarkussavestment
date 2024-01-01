@@ -2,22 +2,24 @@ package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.geekydroid.savestmentbackend.domain.enums.Paymode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ExpenditureRequest {
+public class ExpenditureResponse {
 
-    private String expenditureNumber;
-    private String expenditureDate;
-    private Long expenditureCategoryId;
+    private String expNumber;
+    private Long categoryId;
     private Double amount;
-    private Paymode paymode;
-    private String notes;
-    private String createdBy;
+    private String description;
+    private String paymode;
+    private LocalDate date;
 }
