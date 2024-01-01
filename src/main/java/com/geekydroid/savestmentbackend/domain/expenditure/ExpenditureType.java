@@ -1,6 +1,10 @@
 package com.geekydroid.savestmentbackend.domain.expenditure;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,6 +13,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "EXPENDITURE_TYPE")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExpenditureType extends PanacheEntityBase {
 
     @SequenceGenerator(
@@ -35,15 +43,12 @@ public class ExpenditureType extends PanacheEntityBase {
     private LocalDateTime updatedOn;
 
     @OneToMany(mappedBy = "expenditureType")
-    private List<ExpenditureCategory> expenditureCategoryCollection;
+    private List<ExpenditureCategory> expenditureCategories;
 
     public ExpenditureType(String expenditureName, LocalDateTime createdOn, LocalDateTime updatedOn) {
         this.expenditureName = expenditureName;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
-    }
-
-    public ExpenditureType() {
     }
 
     public Long getExpenditureTypeId() {

@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.service.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureType;
 import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureTypeRequest;
+import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureTypeResponse;
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureTypeRepository;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
@@ -52,7 +53,7 @@ public class ExpenditureTypeServiceImpl implements ExpenditureTypeService {
     }
 
     @Override
-    public List<ExpenditureType> getAllExpenditureTypes() {
+    public List<ExpenditureTypeResponse> getAllExpenditureTypes() {
         return expenditureTypeRepository.getAllExpenditureTypes();
     }
 }

@@ -45,15 +45,14 @@ public class HomeServiceImpl implements HomeService {
                 balanceAmount,
                 totalExpenditures.get(0),
                 totalExpenditures.get(1),
-                categoryWiseExpenses,
-                List.of()
+                categoryWiseExpenses
         );
 
         List<InvestmentTypeOverview> overviews = investmentRepository.getTotalInvestmentItemsByTypeGivenDateRange(startLocalDate, endLocalDate,userId);
 
         AtomicReference<Double> totalInvestmentAmount = new AtomicReference<>(0.0);
         overviews.forEach(item -> totalInvestmentAmount.updateAndGet(v -> v + item.getTotalBuyAmount()));
-        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews, List.of());
+        InvestmentOverview investmentOverview = new InvestmentOverview(totalInvestmentAmount.get(), overviews);
 
         HomeScreenData homeScreenData = new HomeScreenData(expenditureOverview, investmentOverview);
 

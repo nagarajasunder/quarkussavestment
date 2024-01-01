@@ -28,6 +28,7 @@ public class AuthenticationInterceptor implements ContainerRequestFilter {
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
         final String path = info.getPath();
+
         if (!path.contains("signin") && !path.contains("userauth")) {
             String accessToken = containerRequestContext.getHeaderString("Authorization");
             String userID = containerRequestContext.getHeaderString("UserId");

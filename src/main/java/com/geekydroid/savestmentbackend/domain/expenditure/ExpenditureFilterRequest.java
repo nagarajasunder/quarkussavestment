@@ -14,6 +14,10 @@ import java.util.List;
 @Setter
 public class ExpenditureFilterRequest {
 
+    private int pageNo;
+
+    private int itemsPerPage;
+
     private String expenditureType;
 
     private List<String> paymodes;

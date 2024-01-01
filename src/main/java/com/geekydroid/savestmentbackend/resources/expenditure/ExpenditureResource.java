@@ -1,11 +1,9 @@
 package com.geekydroid.savestmentbackend.resources.expenditure;
 
 import com.geekydroid.savestmentbackend.domain.expenditure.*;
-import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureCategoryService;
 import com.geekydroid.savestmentbackend.service.expenditure.ExpenditureService;
 import com.geekydroid.savestmentbackend.utils.ResponseUtil;
 import com.geekydroid.savestmentbackend.utils.models.Error;
-import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -20,8 +18,6 @@ import static com.geekydroid.savestmentbackend.utils.Constants.USER_ID_HEADER_PA
 @Path("/expenditure")
 public class ExpenditureResource {
 
-    @Inject
-    ExpenditureCategoryService expenditureCategoryService;
 
     @Inject
     ExpenditureService expenditureService;
@@ -30,34 +26,35 @@ public class ExpenditureResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addNewExpenditure(ExpenditureRequest request, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
-        String expenditureCategoryStr = request.getExpenditureCategory();
-        ExpenditureCategory expenditureCategory = expenditureCategoryService.getExpenditureCategoryByName(expenditureCategoryStr);
-        if (expenditureCategory == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .build();
+    public Response create(ExpenditureRequest request, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
+        if (request == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
         }
-        NetworkResponse response = expenditureService.createExpenditure(userId, request, expenditureCategory);
-
-        return ResponseUtil.getResponseFromResult(response);
+        request.setCreatedBy(userId);
+        ExpenditureResponse response = expenditureService.create(request);
+        return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
     @PUT()
-    @Path("/updateExpenditure/{expNumber}")
+    @Path("/{expNumber}/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateExpenditure(@PathParam(value = "expNumber") String expNumber, ExpenditureRequest expenditureRequest) {
-        NetworkResponse response = expenditureService.updateExpenditure(expNumber, expenditureRequest);
-        return ResponseUtil.getResponseFromResult(response);
+    public Response update(@PathParam(value = "expNumber") String expNumber, ExpenditureRequest request) {
+        if (request == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
+        }
+        request.setExpenditureNumber(expNumber);
+        ExpenditureResponse response = expenditureService.update(request);
+        return Response.status(Response.Status.OK).entity(response).build();
     }
 
     @DELETE()
-    @Path("/deleteExpenditure/{expNumber}")
+    @Path("/{expNumber}/delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteExpenditure(@PathParam(value = "expNumber") String expNumber) {
-        NetworkResponse response = expenditureService.deleteExpenditure(expNumber);
-        return ResponseUtil.getResponseFromResult(response);
+    public Response delete(@PathParam(value = "expNumber") String expNumber) {
+        ExpenditureResponse response = expenditureService.delete(expNumber);
+        return Response.status(Response.Status.OK).entity(response).build();
     }
 
     @GET()
@@ -96,6 +93,7 @@ public class ExpenditureResource {
 
     @POST()
     @Path("/exportData")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response exportData(
             ExpenditureFilterRequest request,
             @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId

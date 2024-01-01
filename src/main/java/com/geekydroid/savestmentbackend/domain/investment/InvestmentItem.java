@@ -2,7 +2,9 @@ package com.geekydroid.savestmentbackend.domain.investment;
 
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import com.geekydroid.savestmentbackend.db.EquityNumberSequenceGenerator;
@@ -16,6 +18,8 @@ import java.util.UUID;
 @Table(name = "INVESTMENT_ITEMS")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class InvestmentItem extends PanacheEntityBase {
 
     @GenericGenerator(
@@ -40,7 +44,7 @@ public class InvestmentItem extends PanacheEntityBase {
     @Column(name = "INVESTMENT_ID")
     private String investmentId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "investment_types_investment_type_id")
     private InvestmentType investmentType;
 
@@ -83,10 +87,10 @@ public class InvestmentItem extends PanacheEntityBase {
         this.createdBy = createdBy;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
+        this.investmentType.getInvestments().add(this);
     }
 
-    public InvestmentItem() {
-    }
+
 
 }
 

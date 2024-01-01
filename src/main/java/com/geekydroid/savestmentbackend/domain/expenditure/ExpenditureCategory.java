@@ -1,43 +1,30 @@
 package com.geekydroid.savestmentbackend.domain.expenditure;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Parameters;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "EXPENDITURE_CATEGORY")
-@NamedQueries(
-        {
-                @NamedQuery(
-                        name = "ExpenditureCategory.deleteByName",
-                        query = "delete from ExpenditureCategory E where E.categoryName in :categoryName and isCommon != true"
-                )
-        }
-)
 @Getter
 @Setter
-public class ExpenditureCategory extends PanacheEntityBase {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExpenditureCategory {
 
-    @SequenceGenerator(
-            name = "expenditure_category_id_generator",
-            sequenceName = "expenditure_category_id_generator",
-            initialValue = 10,
-            allocationSize = 1
-    )
+
     @Id
-    @GeneratedValue(
-            generator = "expenditure_category_id_generator",
-            strategy = GenerationType.IDENTITY
-    )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "expenditure_category_id")
     private Long expenditureCategoryId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "expenditure_type_expenditure_type_id")
     private ExpenditureType expenditureType;
 
@@ -56,6 +43,9 @@ public class ExpenditureCategory extends PanacheEntityBase {
     @Column(name = "updated_on")
     private LocalDateTime updatedOn;
 
+    @OneToMany(mappedBy = "expenditureCategory")
+    private List<Expenditure> expenditures;
+
     public ExpenditureCategory(
             ExpenditureType expenditureType,
             String categoryName,
@@ -65,19 +55,12 @@ public class ExpenditureCategory extends PanacheEntityBase {
             LocalDateTime updatedOn
     ) {
         this.expenditureType = expenditureType;
+        this.expenditureType.getExpenditureCategories().add(this);
         this.categoryName = categoryName;
         this.isCommon = isCommon;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
+        this.expenditures = new ArrayList<>();
     }
-
-    public ExpenditureCategory() {
-    }
-
-    public static void deleteExpenditureCategoryByName(List<String> categoryName) {
-      delete("#ExpenditureCategory.deleteByName", Parameters.with("categoryName",categoryName));
-
-    }
-
 }

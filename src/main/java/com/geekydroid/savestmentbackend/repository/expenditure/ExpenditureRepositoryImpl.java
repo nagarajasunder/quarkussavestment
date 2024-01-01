@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.geekydroid.savestment.domain.db.Tables.*;
-import static org.jooq.impl.DSL.noCondition;
-import static org.jooq.impl.DSL.sum;
+import static org.jooq.impl.DSL.*;
 
 @ApplicationScoped
 @Transactional
@@ -33,7 +32,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     DSLContext context;
 
     @Override
-    public Expenditure createExpenditure(Expenditure expenditure) {
+    public Expenditure create(Expenditure expenditure) {
         entityManager.persist(expenditure);
         return expenditure;
 
@@ -41,26 +40,22 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
 
     @Override
     @Transactional
-    public Expenditure updateExpenditure(String expNumber, Expenditure expenditure) {
+    public Expenditure update(Expenditure expenditure) {
         return entityManager.merge(expenditure);
 
     }
 
     @Override
-    public Expenditure deleteExpenditure(String expNumber) {
-        Expenditure expenditure = entityManager.find(Expenditure.class, expNumber);
-        if (expenditure == null) {
-            return null;
-        } else {
-            entityManager.remove(expenditure);
-            return expenditure;
-        }
-
+    public Expenditure delete(Expenditure expenditure) {
+        entityManager.remove(expenditure);
+        return expenditure;
     }
 
     @Override
     public Expenditure getExpenditureByExpNumber(String expNumber) {
-        return entityManager.find(Expenditure.class, expNumber);
+        return entityManager.createQuery("SELECT e from Expenditure  e WHERE e.id=?1",Expenditure.class)
+                .setParameter(1,expNumber)
+                .getResultList().stream().findFirst().orElse(null);
     }
 
     @Override
@@ -117,16 +112,16 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             LocalDate toDate,
             String userId,
             List<String> expenditureCategories,
-            int limit
+            int pageNo,
+            int itemsPerPage
     ) {
-
-
         Condition condition = chainFilters(expenditureType, paymode, fromDate, toDate, userId,expenditureCategories);
-        SelectConditionStep<Record7<String, LocalDate, String, String, String, BigDecimal, Paymode>> selectQuery = context.select(
+        SelectConditionStep<Record8<String, LocalDate, String, String, Long, String, BigDecimal, Paymode>> selectQuery = context.select(
                         EXPENDITURE.EXPENDITURE_NUMBER.as("expenditureNumber"),
                         EXPENDITURE.DATE_OF_EXPENDITURE.as("expenditureDate"),
                         EXPENDITURE.EXPENDITURE_DESCRIPTION.as("expenditureDescription"),
                         EXPENDITURE_CATEGORY.CATEGORY_NAME.as("expenditureCategory"),
+                        EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID.as("expenditureCategoryId"),
                         EXPENDITURE_TYPE.EXPENDITURE_NAME.as("expenditureType"),
                         EXPENDITURE.EXPENDITURE_AMOUNT.as("expenditureAmount"),
                         EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).as("paymode"))
@@ -138,14 +133,17 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 .where(
                         condition
                 );
-        if (limit != Integer.MAX_VALUE) {
+
+        if (pageNo > 0 && itemsPerPage > 0) {
+            int offset = ((pageNo - 1) * itemsPerPage);
             return selectQuery
-                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
-                    .limit(limit)
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc(),EXPENDITURE.EXPENDITURE_NUMBER.asc())
+                    .limit(itemsPerPage)
+                    .offset(offset)
                     .fetchInto(ExpenditureItem.class);
         } else {
             return selectQuery
-                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc())
+                    .orderBy(EXPENDITURE.DATE_OF_EXPENDITURE.desc(),EXPENDITURE.EXPENDITURE_NUMBER.asc())
                     .fetchInto(ExpenditureItem.class);
         }
     }
@@ -181,7 +179,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             condition = condition.and(EXPENDITURE.MODE_OF_PAYMENT.convert(PaymodeConverters.getConverter()).in(paymode));
         }
 
-        if (expenditureCategories != null && expenditureCategories.isEmpty()) {
+        if (expenditureCategories != null && !expenditureCategories.isEmpty()) {
             condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
         }
         return condition;
@@ -190,10 +188,12 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
     @Override
     public List<CategoryWiseExpense> getCategoryWiseExpenseByGivenDateRange(String userId,LocalDate startDate, LocalDate endDate) {
 
+        Field<BigDecimal> totalExpenditure = DSL.sum(EXPENDITURE.EXPENDITURE_AMOUNT).as("total_expenditure");
+
 
         return context.select(
                 EXPENDITURE_CATEGORY.CATEGORY_NAME,
-                sum(EXPENDITURE.EXPENDITURE_AMOUNT)
+                totalExpenditure
         ).from(
                 EXPENDITURE
         ).leftJoin(
@@ -208,6 +208,13 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 EXPENDITURE.CREATED_BY.eq(userId).and(EXPENDITURE.DATE_OF_EXPENDITURE.between(startDate, endDate))
         ).groupBy(
                 EXPENDITURE_CATEGORY.CATEGORY_NAME
-        ).fetchInto(CategoryWiseExpense.class);
+        ).orderBy(totalExpenditure.desc()).fetchInto(CategoryWiseExpense.class);
+    }
+
+    @Override
+    public void deleteExpendituresByCategoryId(Long categoryId) {
+        entityManager.createQuery(
+                "delete from Expenditure e where e.expenditureCategory.id=?1"
+        ).setParameter(1,categoryId);
     }
 }
