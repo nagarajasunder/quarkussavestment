@@ -1,6 +1,6 @@
 package com.geekydroid.savestmentbackend.utils;
 
-import com.geekydroid.savestmentbackend.domain.expenditure.ExpenditureItem;
+import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -12,61 +12,48 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ExpenditurePdfGenerator {
+public class InvestmentPdfGenerator {
 
-    public File createPdf(LocalDate startLocalDate, LocalDate endLocalDate, List<ExpenditureItem> expenditureItems) {
+    public File createPdf(LocalDate startLocalDate, LocalDate endLocalDate, List<EquityItem> equityItems) {
 
-        File exportFile = new File("ExpenditureData.pdf");
+        File exportFile = new File("InvestmentData.pdf");
         try (FileOutputStream fos = new FileOutputStream(exportFile)) {
             Document document = new Document();
             PdfWriter.getInstance(document, fos);
             document.open();
 
-            Font titleFont = FontFactory.getFont(FontFactory.COURIER,16,BaseColor.BLACK);
-            Chunk titleChunk = new Chunk("Savestment Expenditure Report",titleFont);
+            Font titleFont = FontFactory.getFont(FontFactory.COURIER,16, BaseColor.BLACK);
+            Chunk titleChunk = new Chunk("Savestment Investment Report",titleFont);
             document.add(titleChunk);
             addDateRangeToDocument(document,startLocalDate,endLocalDate);
             Paragraph blankLine = new Paragraph("              ");
             document.add(blankLine);
             document.add(blankLine);
-            PdfPTable table = new PdfPTable(5);
+            PdfPTable table = new PdfPTable(8);
             addTableHeader(table);
-            Double totalIncome = 0d;
-            Double totalExpense = 0d;
-            for (int i = 0; i < expenditureItems.size(); i++) {
-                ExpenditureItem expenditureItem = expenditureItems.get(i);
+            Double totalBuyAmount = 0d;
+            Double totalSellAmount = 0d;
+            for (int i = 0; i < equityItems.size(); i++) {
+                EquityItem equityItem = equityItems.get(i);
                 addRows(table, String.valueOf(i + 1));
-                addRows(table, expenditureItem.getExpenditureDate().toString());
-                addRows(table, expenditureItem.getExpenditureCategory());
-                addRows(table, expenditureItem.getExpenditureDescription());
-                addRows(table, expenditureItem.getExpenditureAmount().toString());
-                if (expenditureItem.getExpenditureType().equalsIgnoreCase("INCOME")) {
-                    totalIncome+=expenditureItem.getExpenditureAmount();
+                addRows(table, equityItem.getTradeDate().toString());
+                addRows(table, equityItem.getInvestmentType());
+                addRows(table, equityItem.getSymbol());
+                addRows(table, equityItem.getPrice().toString());
+                addRows(table, equityItem.getQuantity().toString());
+                addRows(table, equityItem.getAmountInvested().toString());
+                addRows(table, equityItem.getTradeType());
+                if (equityItem.getTradeType().equalsIgnoreCase("BUY")) {
+                    totalBuyAmount+=equityItem.getAmountInvested();
                 }
                 else {
-                    totalExpense+=expenditureItem.getExpenditureAmount();
+                    totalSellAmount+=equityItem.getAmountInvested();
                 }
             }
-            addRows(table,"");
-            addRows(table,"");
-            addRows(table,"");
-            addRows(table,"Total Income");
-            addRows(table,getAmountFormatted(totalIncome));
-
-            addRows(table,"");
-            addRows(table,"");
-            addRows(table,"");
-            addRows(table,"Total Expense");
-            addRows(table,getAmountFormatted(totalExpense));
-
-            addRows(table,"");
-            addRows(table,"");
-            addRows(table,"");
-            addRows(table,"Balance");
-            addRows(table,getAmountFormatted(totalIncome-totalExpense));
-
             document.add(table);
-
+            Font font = FontFactory.getFont(FontFactory.COURIER,12, BaseColor.BLACK);
+            document.add(new Paragraph("Total Buy Amount - "+getAmountFormatted(totalBuyAmount),font));
+            document.add(new Paragraph("Total Sell Amount - "+getAmountFormatted(totalSellAmount),font));
             document.close();
             return exportFile;
         } catch (Exception e) {
@@ -91,7 +78,7 @@ public class ExpenditurePdfGenerator {
     }
 
     private void addTableHeader(PdfPTable table) {
-        Stream.of("S.No", "Date", "Category", "Notes", "Amount(in Rupees)").forEach(columnTitle -> {
+        Stream.of("S.No", "Trade Date", "Category", "Symbol", "Price","Units","Trade Type","Amount(in Rupees)").forEach(columnTitle -> {
             PdfPCell header = new PdfPCell();
             header.setBackgroundColor(BaseColor.LIGHT_GRAY);
             header.setBorderWidth(2);

@@ -7,7 +7,6 @@ import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureReposi
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.ExpenditurePdfGenerator;
-import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.Success;
 
@@ -249,6 +248,9 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
         LocalDate startLocalDate = null;
         LocalDate endLocalDate = null;
+        if (request.getExpenditureType() == null) {
+            throw new BadRequestException("Expenditure type cannot be null");
+        }
         if (request.getFromDate() != null && !request.getFromDate().isEmpty()) {
             startLocalDate = DateUtils.fromStringToLocalDate(request.getFromDate());
         }

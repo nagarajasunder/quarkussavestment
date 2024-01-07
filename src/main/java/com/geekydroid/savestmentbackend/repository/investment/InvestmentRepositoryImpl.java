@@ -111,7 +111,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             LocalDate fromDate,
             LocalDate toDate,
             String userId,
-            List<String> investmentCategories,
+            List<Long> investmentCategories,
             String tradeType,
             int pageNo,
             int itemsPerPage
@@ -180,7 +180,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             LocalDate fromDate,
             LocalDate toDate,
             String userId,
-            List<String> investmentCategories,
+            List<Long> investmentCategories,
             String tradeType
     ) {
         Condition condition = noCondition();
@@ -201,7 +201,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
             condition = condition.and(INVESTMENT_ITEMS.TRADE_DATE.lessOrEqual(toDate));
         }
         if (investmentCategories != null && !investmentCategories.isEmpty()) {
-            condition = condition.and(INVESTMENT_TYPES.INVESTMENT_NAME.in(investmentCategories));
+            condition = condition.and(INVESTMENT_TYPES.INVESTMENT_TYPE_ID.in(investmentCategories));
         }
         if (tradeType != null && !tradeType.isEmpty() && !tradeType.equalsIgnoreCase(TradeType.UNSPECIFIED.name())) {
             condition = condition.and(INVESTMENT_ITEMS.TRADE_TYPE.eq(tradeType));
