@@ -46,6 +46,10 @@ public class ExpenditureCategory {
     @OneToMany(mappedBy = "expenditureCategory")
     private List<Expenditure> expenditures;
 
+    public void addExpenditure(Expenditure expenditure) {
+        expenditures.add(expenditure);
+    }
+
     public ExpenditureCategory(
             ExpenditureType expenditureType,
             String categoryName,
