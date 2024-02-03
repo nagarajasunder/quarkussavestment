@@ -18,10 +18,10 @@ public class InvestmentPdfGenerator {
 
         File exportFile = new File("InvestmentData.pdf");
         try (FileOutputStream fos = new FileOutputStream(exportFile)) {
-            Document document = new Document();
+            Document document = new Document(PageSize.A3);
             PdfWriter.getInstance(document, fos);
             document.open();
-
+            Font pdfFont = FontFactory.getFont(FontFactory.COURIER,10, BaseColor.BLACK);
             Font titleFont = FontFactory.getFont(FontFactory.COURIER,16, BaseColor.BLACK);
             Chunk titleChunk = new Chunk("Savestment Investment Report",titleFont);
             document.add(titleChunk);
@@ -30,19 +30,21 @@ public class InvestmentPdfGenerator {
             document.add(blankLine);
             document.add(blankLine);
             PdfPTable table = new PdfPTable(8);
-            addTableHeader(table);
+            setColumnWidths(table);
+            table.setWidthPercentage(100);
+            addTableHeader(table,pdfFont);
             Double totalBuyAmount = 0d;
             Double totalSellAmount = 0d;
             for (int i = 0; i < equityItems.size(); i++) {
                 EquityItem equityItem = equityItems.get(i);
-                addRows(table, String.valueOf(i + 1));
-                addRows(table, equityItem.getTradeDate().toString());
-                addRows(table, equityItem.getInvestmentType());
-                addRows(table, equityItem.getSymbol());
-                addRows(table, equityItem.getPrice().toString());
-                addRows(table, equityItem.getQuantity().toString());
-                addRows(table, equityItem.getAmountInvested().toString());
-                addRows(table, equityItem.getTradeType());
+                addRows(table, String.valueOf(i + 1),pdfFont);
+                addRows(table, equityItem.getTradeDate().toString(),pdfFont);
+                addRows(table, equityItem.getInvestmentType(),pdfFont);
+                addRows(table, equityItem.getSymbol(),pdfFont);
+                addRows(table, equityItem.getPrice().toString(),pdfFont);
+                addRows(table, equityItem.getQuantity().toString(),pdfFont);
+                addRows(table, equityItem.getTradeType(),pdfFont);
+                addRows(table, equityItem.getAmountInvested().toString(),pdfFont);
                 if (equityItem.getTradeType().equalsIgnoreCase("BUY")) {
                     totalBuyAmount+=equityItem.getAmountInvested();
                 }
@@ -50,15 +52,36 @@ public class InvestmentPdfGenerator {
                     totalSellAmount+=equityItem.getAmountInvested();
                 }
             }
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"Total Buy Amount",pdfFont);
+            addRows(table,getAmountFormatted(totalBuyAmount),pdfFont);
+
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"",pdfFont);
+            addRows(table,"Total Sell Amount",pdfFont);
+            addRows(table,getAmountFormatted(totalSellAmount),pdfFont);
             document.add(table);
-            Font font = FontFactory.getFont(FontFactory.COURIER,12, BaseColor.BLACK);
-            document.add(new Paragraph("Total Buy Amount - "+getAmountFormatted(totalBuyAmount),font));
-            document.add(new Paragraph("Total Sell Amount - "+getAmountFormatted(totalSellAmount),font));
             document.close();
             return exportFile;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private void setColumnWidths(PdfPTable table) throws DocumentException {
+        float totalWidth = 800f;
+        table.setTotalWidth(totalWidth);
+        float[] columnWidths = new float[]{totalWidth*0.05f,totalWidth*0.15f,totalWidth*0.2f,totalWidth*0.2f,totalWidth*0.1f,totalWidth*0.1f,totalWidth*0.1f,totalWidth*0.1f};
+        table.setWidths(columnWidths);
     }
 
     private void addDateRangeToDocument(Document document, LocalDate startLocalDate, LocalDate endLocalDate) throws DocumentException {
@@ -73,16 +96,16 @@ public class InvestmentPdfGenerator {
         return Constants.RUPEE_SYMBOL + " " +String.format("%.2f",num);
     }
 
-    private void addRows(PdfPTable table, String data) {
-        table.addCell(data);
+    private void addRows(PdfPTable table, String data,Font font) {
+        table.addCell(new Phrase(data,font));
     }
 
-    private void addTableHeader(PdfPTable table) {
-        Stream.of("S.No", "Trade Date", "Category", "Symbol", "Price","Units","Trade Type","Amount(in Rupees)").forEach(columnTitle -> {
+    private void addTableHeader(PdfPTable table,Font font) {
+        Stream.of("S.No", "Date", "Category", "Symbol", "Price(in Rupees)","Units","Trade Type","Amount(in Rupees)").forEach(columnTitle -> {
             PdfPCell header = new PdfPCell();
             header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-            header.setBorderWidth(2);
-            header.setPhrase(new Phrase(columnTitle));
+            header.setBorderWidth(1);
+            header.setPhrase(new Phrase(columnTitle,font));
             table.addCell(header);
         });
     }

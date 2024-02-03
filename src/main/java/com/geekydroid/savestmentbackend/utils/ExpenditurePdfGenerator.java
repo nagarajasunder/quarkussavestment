@@ -18,10 +18,10 @@ public class ExpenditurePdfGenerator {
 
         File exportFile = new File("ExpenditureData.pdf");
         try (FileOutputStream fos = new FileOutputStream(exportFile)) {
-            Document document = new Document();
+            Document document = new Document(PageSize.A3);
             PdfWriter.getInstance(document, fos);
             document.open();
-
+            Font headerFont = FontFactory.getFont(FontFactory.COURIER,14,BaseColor.BLACK);
             Font titleFont = FontFactory.getFont(FontFactory.COURIER,16,BaseColor.BLACK);
             Chunk titleChunk = new Chunk("Savestment Expenditure Report",titleFont);
             document.add(titleChunk);
@@ -29,14 +29,17 @@ public class ExpenditurePdfGenerator {
             Paragraph blankLine = new Paragraph("              ");
             document.add(blankLine);
             document.add(blankLine);
-            PdfPTable table = new PdfPTable(5);
-            addTableHeader(table);
+            PdfPTable table = new PdfPTable(6);
+            setColumnWidths(table);
+            table.setWidthPercentage(100);
+            addTableHeader(table,headerFont);
             Double totalIncome = 0d;
             Double totalExpense = 0d;
             for (int i = 0; i < expenditureItems.size(); i++) {
                 ExpenditureItem expenditureItem = expenditureItems.get(i);
                 addRows(table, String.valueOf(i + 1));
                 addRows(table, expenditureItem.getExpenditureDate().toString());
+                addRows(table,expenditureItem.getExpenditureType());
                 addRows(table, expenditureItem.getExpenditureCategory());
                 addRows(table, expenditureItem.getExpenditureDescription());
                 addRows(table, expenditureItem.getExpenditureAmount().toString());
@@ -50,15 +53,18 @@ public class ExpenditurePdfGenerator {
             addRows(table,"");
             addRows(table,"");
             addRows(table,"");
+            addRows(table,"");
             addRows(table,"Total Income");
             addRows(table,getAmountFormatted(totalIncome));
 
             addRows(table,"");
             addRows(table,"");
             addRows(table,"");
+            addRows(table,"");
             addRows(table,"Total Expense");
             addRows(table,getAmountFormatted(totalExpense));
 
+            addRows(table,"");
             addRows(table,"");
             addRows(table,"");
             addRows(table,"");
@@ -72,6 +78,13 @@ public class ExpenditurePdfGenerator {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private void setColumnWidths(PdfPTable table) throws DocumentException {
+        float totalWidth = 500f;
+        table.setTotalWidth(totalWidth);
+        float[] columnWidths = new float[]{totalWidth*0.1f,totalWidth*0.15f,totalWidth*0.15f,totalWidth*0.15f,totalWidth*0.3f,totalWidth*0.15f};
+        table.setWidths(columnWidths);
     }
 
     private void addDateRangeToDocument(Document document, LocalDate startLocalDate, LocalDate endLocalDate) throws DocumentException {
@@ -90,12 +103,12 @@ public class ExpenditurePdfGenerator {
         table.addCell(data);
     }
 
-    private void addTableHeader(PdfPTable table) {
-        Stream.of("S.No", "Date", "Category", "Notes", "Amount(in Rupees)").forEach(columnTitle -> {
+    private void addTableHeader(PdfPTable table,Font font) {
+        Stream.of("S.No", "Date","Expenditure Type", "Category", "Notes", "Amount(in Rupees)").forEach(columnTitle -> {
             PdfPCell header = new PdfPCell();
             header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-            header.setBorderWidth(2);
-            header.setPhrase(new Phrase(columnTitle));
+            header.setBorderWidth(1);
+            header.setPhrase(new Phrase(columnTitle,font));
             table.addCell(header);
         });
     }
