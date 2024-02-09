@@ -60,6 +60,7 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         expenditure.setExpenditureDate(DateUtils.fromStringToLocalDate(request.getExpenditureDate()));
         expenditure.setCreatedBy(request.getCreatedBy());
         expenditure.setCreatedOn(now);
+        expenditure.setUpdatedOn(now);
         expenditure = repository.create(expenditure);
         return new ExpenditureResponse(
                 expenditure.getExpenditureNumber(),
