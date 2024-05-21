@@ -187,6 +187,7 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 .on(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID.eq(INVESTMENT_TYPES.INVESTMENT_TYPE_ID))
                 .where(INVESTMENT_ITEMS.CREATED_BY.eq(userId))
                 .groupBy(INVESTMENT_TYPES.INVESTMENT_NAME)
+                .orderBy(sum(INVESTMENT_ITEMS.AMOUNT_INVESTED).desc())
                 .fetchInto(InvestmentPortfolioItem.class);
     }
 
