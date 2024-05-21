@@ -217,6 +217,22 @@ public class InvestmentServiceImpl implements InvestmentService {
         return generator.createPdf(localStartDate,localEndDate,results);
     }
 
+    @Override
+    public InvestmentPortfolio getInvestmentPortfolio(String userId) {
+        List<InvestmentPortfolioItem> portfolioItems = investmentRepository.getInvestmentPortfolio(userId);
+        Double totalInvestment = 0d;
+        for (InvestmentPortfolioItem item : portfolioItems) {
+            totalInvestment+=item.getAssetAllocated();
+        }
+
+        Double finalTotalInvestment = totalInvestment;
+        portfolioItems = portfolioItems.stream().map(investmentPortfolioItem -> {
+            investmentPortfolioItem.setAllocationPercentage((investmentPortfolioItem.getAssetAllocated()/ finalTotalInvestment)*100f);
+            return investmentPortfolioItem;
+        }).toList();
+        return new InvestmentPortfolio(totalInvestment,portfolioItems);
+    }
+
 
 
 }

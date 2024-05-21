@@ -36,4 +36,6 @@ public interface InvestmentRepository {
     );
 
     EquityItem getByNumber(String investmentNumber);
+
+    List<InvestmentPortfolioItem> getInvestmentPortfolio(String userId);
 }

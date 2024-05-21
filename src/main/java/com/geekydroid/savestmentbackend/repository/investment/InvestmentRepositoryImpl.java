@@ -4,6 +4,7 @@ package com.geekydroid.savestmentbackend.repository.investment;
 import com.geekydroid.savestmentbackend.domain.enums.TradeType;
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentItem;
+import com.geekydroid.savestmentbackend.domain.investment.InvestmentPortfolioItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentTypeOverview;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -18,6 +19,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_ITEMS;
 import static com.geekydroid.savestment.domain.db.Tables.INVESTMENT_TYPES;
@@ -172,6 +174,20 @@ public class InvestmentRepositoryImpl implements InvestmentRepository {
                 .where(INVESTMENT_ITEMS.INVESTMENT_ID.eq(investmentNumber))
                 .fetchSingle()
                 .into(EquityItem.class);
+    }
+
+    @Override
+    public List<InvestmentPortfolioItem> getInvestmentPortfolio(String userId) {
+        return context.select(
+                INVESTMENT_TYPES.INVESTMENT_NAME.as("asset_class"),
+                sum(INVESTMENT_ITEMS.AMOUNT_INVESTED).as("asset_allocated"),
+                zero().as("allocation_percentageh")
+        ).from(INVESTMENT_ITEMS)
+                .leftJoin(INVESTMENT_TYPES)
+                .on(INVESTMENT_ITEMS.INVESTMENT_TYPES_INVESTMENT_TYPE_ID.eq(INVESTMENT_TYPES.INVESTMENT_TYPE_ID))
+                .where(INVESTMENT_ITEMS.CREATED_BY.eq(userId))
+                .groupBy(INVESTMENT_TYPES.INVESTMENT_NAME)
+                .fetchInto(InvestmentPortfolioItem.class);
     }
 
 
