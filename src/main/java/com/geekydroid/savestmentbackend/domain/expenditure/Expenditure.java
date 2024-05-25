@@ -14,15 +14,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "EXPENDITURE")
-@NamedQueries(
-        {
-
-                @NamedQuery(
-                        name = "Expenditure.deleteByExpNumber",
-                        query = "delete from Expenditure e where e.expenditureNumber in ?1"
-                )
-        }
-)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -72,23 +63,9 @@ public class Expenditure {
 
     public Expenditure
             (
-                    ExpenditureCategory expenditureCategory,
-                    Double expenditureAmount,
-                    String expenditureDescription,
-                    Paymode paymode,
-                    LocalDate expenditureDate,
-                    String createdBy,
-                    LocalDateTime createdOn,
-                    LocalDateTime updatedOn
+                    ExpenditureCategory expenditureCategory
             ) {
+        expenditureCategory.addExpenditure(this);
         this.expenditureCategory = expenditureCategory;
-        this.expenditureAmount = expenditureAmount;
-        this.expenditureDescription = expenditureDescription;
-        this.paymode = paymode;
-        this.expenditureDate = expenditureDate;
-        this.createdBy = createdBy;
-        this.createdOn = createdOn;
-        this.updatedOn = updatedOn;
-        this.expenditureCategory.getExpenditures().add(this);
     }
 }

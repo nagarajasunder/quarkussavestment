@@ -26,7 +26,7 @@ public class ExpenditureFilterRequest {
 
     private String toDate;
 
-    private List<String> categories;
+    private List<Long> categories;
 
     @Override
     public String toString() {

@@ -1,11 +1,10 @@
 package com.geekydroid.savestmentbackend.service.investment;
 
-import com.geekydroid.savestmentbackend.domain.expenditure.CategoryRespnose;
 import com.geekydroid.savestmentbackend.domain.investment.*;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentRepository;
 import com.geekydroid.savestmentbackend.repository.investment.InvestmentTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
-import com.geekydroid.savestmentbackend.utils.InvestmentExcelGenerator;
+import com.geekydroid.savestmentbackend.utils.InvestmentPdfGenerator;
 import com.geekydroid.savestmentbackend.utils.models.Error;
 import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
@@ -17,7 +16,6 @@ import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -215,17 +213,26 @@ public class InvestmentServiceImpl implements InvestmentService {
                 filterRequest.getTradeType(),
                 0, 0
         );
-        List<CategoryRespnose> investmentTypes = investmentTypeRepository.getAllInvestmentCategories();
-        return createExcel(investmentTypes, results);
+        InvestmentPdfGenerator generator = new InvestmentPdfGenerator();
+        return generator.createPdf(localStartDate,localEndDate,results);
     }
 
-    private File createExcel(List<CategoryRespnose> investmentTypes, List<EquityItem> results) {
-        try {
-            InvestmentExcelGenerator generator = new InvestmentExcelGenerator();
-            return generator.createExcel(investmentTypes, results);
-        } catch (IOException ignored) {
-            return null;
+    @Override
+    public InvestmentPortfolio getInvestmentPortfolio(String userId) {
+        List<InvestmentPortfolioItem> portfolioItems = investmentRepository.getInvestmentPortfolio(userId);
+        Double totalInvestment = 0d;
+        for (InvestmentPortfolioItem item : portfolioItems) {
+            totalInvestment+=item.getAssetAllocated();
         }
+
+        Double finalTotalInvestment = totalInvestment;
+        portfolioItems = portfolioItems.stream().map(investmentPortfolioItem -> {
+            investmentPortfolioItem.setAllocationPercentage((investmentPortfolioItem.getAssetAllocated()/ finalTotalInvestment)*100f);
+            return investmentPortfolioItem;
+        }).toList();
+        return new InvestmentPortfolio(totalInvestment,portfolioItems);
     }
+
+
 
 }

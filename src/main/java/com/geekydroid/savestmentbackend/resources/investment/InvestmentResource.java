@@ -3,6 +3,7 @@ package com.geekydroid.savestmentbackend.resources.investment;
 
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentFilterRequest;
+import com.geekydroid.savestmentbackend.domain.investment.InvestmentPortfolio;
 import com.geekydroid.savestmentbackend.service.investment.InvestmentService;
 import com.geekydroid.savestmentbackend.utils.ResponseUtil;
 
@@ -36,7 +37,7 @@ public class InvestmentResource {
     }
 
     @POST()
-    @Path("/bulkupload")
+    @Path("/bulk-create")
     @Transactional
     public Response createBulk(List<EquityItem> equityItems, @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId) {
         return ResponseUtil.getResponseFromResult(investmentService.addEquityItems(equityItems, userId));
@@ -116,6 +117,14 @@ public class InvestmentResource {
         responseBuilder.header("Content-Disposition","attachment; filename="+file.getName());
         file.deleteOnExit();
         return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/portfolio")
+    public InvestmentPortfolio getInvestmentPortfolio(
+            @HeaderParam(USER_ID_HEADER_PARAM_KEY) String userId
+    ) {
+        return investmentService.getInvestmentPortfolio(userId);
     }
 
 }
