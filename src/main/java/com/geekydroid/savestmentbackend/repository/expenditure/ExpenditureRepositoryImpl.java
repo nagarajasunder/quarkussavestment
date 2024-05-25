@@ -111,7 +111,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
             LocalDate fromDate,
             LocalDate toDate,
             String userId,
-            List<String> expenditureCategories,
+            List<Long> expenditureCategories,
             int pageNo,
             int itemsPerPage
     ) {
@@ -158,7 +158,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
                 .fetchInto(String.class);
     }
 
-    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, String userId,List<String> expenditureCategories) {
+    private Condition chainFilters(String expenditureType, List<Paymode> paymode, LocalDate fromDate, LocalDate toDate, String userId,List<Long> expenditureCategories) {
         Condition condition = noCondition();
 
         if (userId != null && !userId.isEmpty()) {
@@ -180,7 +180,7 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepository {
         }
 
         if (expenditureCategories != null && !expenditureCategories.isEmpty()) {
-            condition = condition.and(EXPENDITURE_CATEGORY.CATEGORY_NAME.in(expenditureCategories));
+            condition = condition.and(EXPENDITURE_CATEGORY.EXPENDITURE_CATEGORY_ID.in(expenditureCategories));
         }
         return condition;
     }

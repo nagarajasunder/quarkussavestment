@@ -29,11 +29,13 @@ public interface InvestmentRepository {
             LocalDate fromDate,
             LocalDate toDate,
             String userId,
-            List<String> investmentCategories,
+            List<Long> investmentCategories,
             String tradeType,
             int pageNo,
             int itemsPerPage
     );
 
     EquityItem getByNumber(String investmentNumber);
+
+    List<InvestmentPortfolioItem> getInvestmentPortfolio(String userId);
 }

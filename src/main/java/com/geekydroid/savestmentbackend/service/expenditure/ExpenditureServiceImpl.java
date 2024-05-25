@@ -7,7 +7,6 @@ import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureReposi
 import com.geekydroid.savestmentbackend.repository.expenditure.ExpenditureTypeRepository;
 import com.geekydroid.savestmentbackend.utils.DateUtils;
 import com.geekydroid.savestmentbackend.utils.ExpenditurePdfGenerator;
-import com.geekydroid.savestmentbackend.utils.models.GenericNetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 import com.geekydroid.savestmentbackend.utils.models.Success;
 
@@ -29,8 +28,6 @@ public class ExpenditureServiceImpl implements ExpenditureService {
 
     @Inject
     ExpenditureRepository repository;
-    @Inject
-    ExpenditureCategoryService expenditureCategoryService;
 
     @Inject
     ExpenditureTypeRepository expenditureTypeRepository;
@@ -56,17 +53,15 @@ public class ExpenditureServiceImpl implements ExpenditureService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        Expenditure newExpenditure = new Expenditure(
-                category,
-                request.getAmount(),
-                request.getNotes(),
-                request.getPaymode(),
-                DateUtils.fromStringToLocalDate(request.getExpenditureDate()),
-                request.getCreatedBy(),
-                now,
-                now
-        );
-        Expenditure expenditure = repository.create(newExpenditure);
+        Expenditure expenditure = new Expenditure(category);
+        expenditure.setExpenditureAmount(request.getAmount());
+        expenditure.setExpenditureDescription(request.getNotes());
+        expenditure.setPaymode(request.getPaymode());
+        expenditure.setExpenditureDate(DateUtils.fromStringToLocalDate(request.getExpenditureDate()));
+        expenditure.setCreatedBy(request.getCreatedBy());
+        expenditure.setCreatedOn(now);
+        expenditure.setUpdatedOn(now);
+        expenditure = repository.create(expenditure);
         return new ExpenditureResponse(
                 expenditure.getExpenditureNumber(),
                 expenditure.getExpenditureCategory().getExpenditureCategoryId(),

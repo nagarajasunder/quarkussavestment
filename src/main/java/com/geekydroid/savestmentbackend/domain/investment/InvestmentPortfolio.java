@@ -12,15 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class InvestmentFilterRequest {
-
-    private String equityId;
-    private String fromDate;
-    private String toDate;
-    private List<Long> investmentCategories;
-    private String tradeType;
-    private int pageNo;
-    private int limit;
-
-
+public class InvestmentPortfolio {
+    private Double totalInvestment;
+    private List<InvestmentPortfolioItem> assets;
 }

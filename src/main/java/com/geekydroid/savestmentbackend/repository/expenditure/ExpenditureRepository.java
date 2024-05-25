@@ -30,7 +30,7 @@ public interface ExpenditureRepository {
             LocalDate fromDate,
             LocalDate toDate,
             String userId,
-            List<String> expenditureCategories,
+            List<Long> expenditureCategories,
             int pageNo,
             int itemsPerPage
     );

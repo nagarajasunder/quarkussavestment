@@ -2,6 +2,7 @@ package com.geekydroid.savestmentbackend.service.investment;
 
 import com.geekydroid.savestmentbackend.domain.investment.EquityItem;
 import com.geekydroid.savestmentbackend.domain.investment.InvestmentFilterRequest;
+import com.geekydroid.savestmentbackend.domain.investment.InvestmentPortfolio;
 import com.geekydroid.savestmentbackend.utils.models.NetworkResponse;
 
 import java.io.File;
@@ -24,4 +25,6 @@ public interface InvestmentService {
     NetworkResponse getInvestmentItemsBasedOnGivenFilters(InvestmentFilterRequest filterRequest,String userId);
 
     File exportDataToExcel(InvestmentFilterRequest request,String userId);
+
+    InvestmentPortfolio getInvestmentPortfolio(String userId);
 }
